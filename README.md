@@ -36,6 +36,20 @@ A saida deve informar `Java version: 21`. Configure a mesma JDK na IDE.
 
 No Windows, substitua `./mvnw` por `./mvnw.cmd`.
 
+Para executar aplicacao e PostgreSQL em containers:
+
+```bash
+docker compose up --build --wait
+docker compose down
+```
+
+O Compose usa credenciais exclusivamente locais e a imagem fixada `postgres:17.10-alpine3.24`. Para executar somente o banco e iniciar a aplicacao pela IDE:
+
+```bash
+docker compose up -d postgres --wait
+./mvnw spring-boot:run
+```
+
 Com a aplicacao iniciada:
 
 - Health: `http://localhost:8080/actuator/health`
