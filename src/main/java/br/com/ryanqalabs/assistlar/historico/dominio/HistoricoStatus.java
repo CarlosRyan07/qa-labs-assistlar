@@ -51,6 +51,12 @@ public class HistoricoStatus {
                 statusAnterior, statusNovo, motivo, tipoResponsavel, instante);
     }
 
+    public static HistoricoStatus registrarSolicitacao(UUID solicitacaoId, String statusAnterior,
+            String statusNovo, String motivo, TipoResponsavel tipoResponsavel, Instant instante) {
+        return new HistoricoStatus(UUID.randomUUID(), TipoEntidadeHistorico.SOLICITACAO_ASSISTENCIA, solicitacaoId,
+                statusAnterior, statusNovo, motivo, tipoResponsavel, instante);
+    }
+
     private static String normalizarMotivo(String motivo) {
         return motivo == null || motivo.isBlank() ? null : motivo.strip();
     }

@@ -34,4 +34,13 @@ class HistoricoStatusTest {
 
         assertThat(historico.getMotivo()).isNull();
     }
+
+    @Test
+    void deveRegistrarHistoricoDaSolicitacao() {
+        HistoricoStatus historico = HistoricoStatus.registrarSolicitacao(UUID.randomUUID(), "ABERTA",
+                "EM_ATENDIMENTO", null, TipoResponsavel.OPERADOR, Instant.parse("2026-07-20T15:00:00Z"));
+
+        assertThat(historico.getTipoEntidade()).isEqualTo(TipoEntidadeHistorico.SOLICITACAO_ASSISTENCIA);
+        assertThat(historico.getStatusNovo()).isEqualTo("EM_ATENDIMENTO");
+    }
 }
