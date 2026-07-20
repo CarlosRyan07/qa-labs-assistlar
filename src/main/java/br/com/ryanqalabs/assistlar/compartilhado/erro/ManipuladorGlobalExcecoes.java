@@ -44,6 +44,12 @@ public class ManipuladorGlobalExcecoes {
                 excecao.getMessage(), requisicao, List.of());
     }
 
+    @ExceptionHandler(ExcecaoDadosInvalidos.class)
+    ResponseEntity<ProblemDetail> dadosInvalidos(ExcecaoDadosInvalidos excecao, HttpServletRequest requisicao) {
+        return resposta(HttpStatus.BAD_REQUEST, excecao.getCodigo(), "Dados invalidos",
+                excecao.getMessage(), requisicao, List.of());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<ProblemDetail> validacao(MethodArgumentNotValidException excecao, HttpServletRequest requisicao) {
         List<ErroValidacao> erros = excecao.getBindingResult().getFieldErrors().stream()
