@@ -17,6 +17,8 @@ spring:
           time_zone: UTC
   jackson:
     time-zone: UTC
+    deserialization:
+      fail-on-unknown-properties: true
 
 management:
   endpoints:
