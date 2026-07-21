@@ -19,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import br.com.ryanqalabs.assistlar.cliente.dominio.Cliente;
 import br.com.ryanqalabs.assistlar.cliente.infraestrutura.ClienteRepository;
 import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoConflito;
-import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoRegraNegocio;
 import br.com.ryanqalabs.assistlar.contratacao.api.ContratacaoCriacaoRequisicao;
 import br.com.ryanqalabs.assistlar.contratacao.api.ContratacaoResposta;
 import br.com.ryanqalabs.assistlar.contratacao.aplicacao.ContratacaoService;
@@ -59,7 +58,7 @@ class SolicitacaoConcorrenciaIT extends PostgreSqlTestContainer {
     private Clock relogio;
 
     @Test
-    void deveImpedirConsumoAcimaDoLimiteEmAberturasSimultaneas() throws Exception {
+    void deveManterLimiteEAberturaUnicaDoMesmoTipoEmOperacoesSimultaneas() throws Exception {
         UUID contratacaoId = criarContratacaoCompletaAtiva();
         SolicitacaoResposta primeira = solicitacaoService.abrir(requisicao(contratacaoId));
         solicitacaoService.iniciar(primeira.id());
@@ -68,13 +67,17 @@ class SolicitacaoConcorrenciaIT extends PostgreSqlTestContainer {
         CountDownLatch prontas = new CountDownLatch(2);
         CountDownLatch iniciar = new CountDownLatch(1);
         try (var executor = Executors.newFixedThreadPool(2)) {
-            Future<String> uma = executor.submit(() -> abrirConcorrente(contratacaoId, prontas, iniciar));
-            Future<String> outra = executor.submit(() -> abrirConcorrente(contratacaoId, prontas, iniciar));
+            Future<ResultadoConcorrencia> uma = executor.submit(
+                    () -> abrirConcorrente(contratacaoId, prontas, iniciar));
+            Future<ResultadoConcorrencia> outra = executor.submit(
+                    () -> abrirConcorrente(contratacaoId, prontas, iniciar));
             assertThat(prontas.await(5, TimeUnit.SECONDS)).isTrue();
             iniciar.countDown();
 
             assertThat(List.of(uma.get(10, TimeUnit.SECONDS), outra.get(10, TimeUnit.SECONDS)))
-                    .containsExactlyInAnyOrder("SUCESSO", "REJEITADA");
+                    .containsExactlyInAnyOrder(
+                            ResultadoConcorrencia.SUCESSO,
+                            ResultadoConcorrencia.SOLICITACAO_EM_ANDAMENTO_EXISTENTE);
         }
 
         long consumo = solicitacaoRepository.countByContratacaoIdAndTipoAssistenciaAndStatusIn(
@@ -90,13 +93,17 @@ class SolicitacaoConcorrenciaIT extends PostgreSqlTestContainer {
         CountDownLatch iniciar = new CountDownLatch(1);
 
         try (var executor = Executors.newFixedThreadPool(2)) {
-            Future<String> uma = executor.submit(() -> iniciarConcorrente(solicitacaoId, prontas, iniciar));
-            Future<String> outra = executor.submit(() -> iniciarConcorrente(solicitacaoId, prontas, iniciar));
+            Future<ResultadoConcorrencia> uma = executor.submit(
+                    () -> iniciarConcorrente(solicitacaoId, prontas, iniciar));
+            Future<ResultadoConcorrencia> outra = executor.submit(
+                    () -> iniciarConcorrente(solicitacaoId, prontas, iniciar));
             assertThat(prontas.await(5, TimeUnit.SECONDS)).isTrue();
             iniciar.countDown();
 
             assertThat(List.of(uma.get(10, TimeUnit.SECONDS), outra.get(10, TimeUnit.SECONDS)))
-                    .containsExactlyInAnyOrder("SUCESSO", "CONFLITO");
+                    .containsExactlyInAnyOrder(
+                            ResultadoConcorrencia.SUCESSO,
+                            ResultadoConcorrencia.CONFLITO_OTIMISTA);
         }
 
         assertThat(solicitacaoRepository.findById(solicitacaoId).orElseThrow().getStatus())
@@ -105,25 +112,27 @@ class SolicitacaoConcorrenciaIT extends PostgreSqlTestContainer {
                 TipoEntidadeHistorico.SOLICITACAO_ASSISTENCIA, solicitacaoId)).hasSize(2);
     }
 
-    private String abrirConcorrente(UUID contratacaoId, CountDownLatch prontas, CountDownLatch iniciar)
+    private ResultadoConcorrencia abrirConcorrente(UUID contratacaoId, CountDownLatch prontas, CountDownLatch iniciar)
             throws InterruptedException {
         aguardarDisparo(prontas, iniciar);
         try {
             solicitacaoService.abrir(requisicao(contratacaoId));
-            return "SUCESSO";
-        } catch (ExcecaoConflito | ExcecaoRegraNegocio excecao) {
-            return "REJEITADA";
+            return ResultadoConcorrencia.SUCESSO;
+        } catch (ExcecaoConflito excecao) {
+            assertThat(excecao.getCodigo()).isEqualTo("solicitacao-em-andamento-existente");
+            return ResultadoConcorrencia.SOLICITACAO_EM_ANDAMENTO_EXISTENTE;
         }
     }
 
-    private String iniciarConcorrente(UUID solicitacaoId, CountDownLatch prontas, CountDownLatch iniciar)
+    private ResultadoConcorrencia iniciarConcorrente(UUID solicitacaoId, CountDownLatch prontas, CountDownLatch iniciar)
             throws InterruptedException {
         aguardarDisparo(prontas, iniciar);
         try {
             solicitacaoService.iniciar(solicitacaoId);
-            return "SUCESSO";
+            return ResultadoConcorrencia.SUCESSO;
         } catch (ExcecaoConflito excecao) {
-            return "CONFLITO";
+            assertThat(excecao.getCodigo()).isEqualTo("concorrencia-solicitacao");
+            return ResultadoConcorrencia.CONFLITO_OTIMISTA;
         }
     }
 
@@ -145,5 +154,11 @@ class SolicitacaoConcorrenciaIT extends PostgreSqlTestContainer {
     private SolicitacaoCriacaoRequisicao requisicao(UUID contratacaoId) {
         return new SolicitacaoCriacaoRequisicao(contratacaoId, TipoAssistencia.ELETRICISTA,
                 "Falha eletrica concorrente");
+    }
+
+    private enum ResultadoConcorrencia {
+        SUCESSO,
+        SOLICITACAO_EM_ANDAMENTO_EXISTENTE,
+        CONFLITO_OTIMISTA
     }
 }

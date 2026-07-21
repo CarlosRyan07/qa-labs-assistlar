@@ -14,6 +14,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
+import org.postgresql.util.PSQLException;
+import org.postgresql.util.PSQLState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -49,16 +51,20 @@ class ContratacaoConcorrenciaIT extends PostgreSqlTestContainer {
         CountDownLatch iniciar = new CountDownLatch(1);
 
         try (var executor = Executors.newFixedThreadPool(2)) {
-            Future<String> primeira = executor.submit(() -> inserirConcorrente(cliente.getId(), prontas, iniciar));
-            Future<String> segunda = executor.submit(() -> inserirConcorrente(cliente.getId(), prontas, iniciar));
+            Future<ResultadoInsercao> primeira = executor.submit(
+                    () -> inserirConcorrente(cliente.getId(), prontas, iniciar));
+            Future<ResultadoInsercao> segunda = executor.submit(
+                    () -> inserirConcorrente(cliente.getId(), prontas, iniciar));
 
             assertThat(prontas.await(5, TimeUnit.SECONDS)).isTrue();
             iniciar.countDown();
-            List<String> resultados = List.of(
+            List<ResultadoInsercao> resultados = List.of(
                     primeira.get(10, TimeUnit.SECONDS),
                     segunda.get(10, TimeUnit.SECONDS));
 
-            assertThat(resultados).containsExactlyInAnyOrder("SUCESSO", "CONFLITO");
+            assertThat(resultados).containsExactlyInAnyOrder(
+                    ResultadoInsercao.SUCESSO,
+                    ResultadoInsercao.VIOLACAO_UNICIDADE_ESPERADA);
         }
 
         Integer quantidade = jdbcTemplate.queryForObject("""
@@ -68,7 +74,7 @@ class ContratacaoConcorrenciaIT extends PostgreSqlTestContainer {
         assertThat(quantidade).isEqualTo(1);
     }
 
-    private String inserirConcorrente(UUID clienteId, CountDownLatch prontas, CountDownLatch iniciar)
+    private ResultadoInsercao inserirConcorrente(UUID clienteId, CountDownLatch prontas, CountDownLatch iniciar)
             throws InterruptedException {
         prontas.countDown();
         if (!iniciar.await(5, TimeUnit.SECONDS)) {
@@ -80,9 +86,30 @@ class ContratacaoConcorrenciaIT extends PostgreSqlTestContainer {
                         id, cliente_id, plano_assistencia_id, status, criada_em, versao
                     ) VALUES (?, ?, ?, 'PENDENTE', ?, 0)
                     """, UUID.randomUUID(), clienteId, PLANO_ESSENCIAL, OffsetDateTime.now(ZoneOffset.UTC)));
-            return "SUCESSO";
+            return ResultadoInsercao.SUCESSO;
         } catch (DataIntegrityViolationException excecao) {
-            return "CONFLITO";
+            PSQLException postgres = encontrarCausaPostgreSql(excecao);
+            assertThat(postgres.getSQLState()).isEqualTo(PSQLState.UNIQUE_VIOLATION.getState());
+            assertThat(postgres.getServerErrorMessage()).isNotNull();
+            assertThat(postgres.getServerErrorMessage().getConstraint())
+                    .isEqualTo("uq_contratacao_vigente_cliente");
+            return ResultadoInsercao.VIOLACAO_UNICIDADE_ESPERADA;
         }
+    }
+
+    private PSQLException encontrarCausaPostgreSql(Throwable excecao) {
+        Throwable causa = excecao;
+        while (causa != null) {
+            if (causa instanceof PSQLException postgres) {
+                return postgres;
+            }
+            causa = causa.getCause();
+        }
+        throw new AssertionError("A violacao nao possui uma causa do PostgreSQL.", excecao);
+    }
+
+    private enum ResultadoInsercao {
+        SUCESSO,
+        VIOLACAO_UNICIDADE_ESPERADA
     }
 }
