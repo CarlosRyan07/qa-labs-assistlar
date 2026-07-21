@@ -19,6 +19,10 @@ spring:
     time-zone: UTC
     deserialization:
       fail-on-unknown-properties: true
+  web:
+    error:
+      include-message: never
+      include-stacktrace: never
 
 management:
   endpoints:
@@ -32,8 +36,3 @@ management:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
-
-server:
-  error:
-    include-message: never
-    include-stacktrace: never
