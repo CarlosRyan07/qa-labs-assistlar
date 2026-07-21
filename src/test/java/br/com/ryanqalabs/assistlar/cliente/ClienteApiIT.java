@@ -115,6 +115,56 @@ class ClienteApiIT extends PostgreSqlTestContainer {
     }
 
     @Test
+    void deveAceitarExatamenteDezoitoAnosERejeitarMenores() {
+        LocalDate hoje = LocalDate.now(TempoConfiguracao.FUSO_NEGOCIO);
+        LocalDate exatamenteDezoito = hoje.minusYears(18);
+        LocalDate aindaMenor = exatamenteDezoito.plusDays(1);
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(requisicao("Cliente Adulto", "adulto-" + UUID.randomUUID() + "@exemplo.com",
+                        exatamenteDezoito))
+        .when()
+                .post("/clientes")
+        .then()
+                .statusCode(201)
+                .body("dataNascimento", equalTo(exatamenteDezoito.toString()));
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(requisicao("Cliente Menor", "menor-" + UUID.randomUUID() + "@exemplo.com", aindaMenor))
+        .when()
+                .post("/clientes")
+        .then()
+                .statusCode(422)
+                .body("type", equalTo("/erros/idade-minima-nao-atendida"))
+                .body("detail", equalTo("O cliente deve ter pelo menos 18 anos."));
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(requisicao("Cliente Hoje", "hoje-" + UUID.randomUUID() + "@exemplo.com", hoje))
+        .when()
+                .post("/clientes")
+        .then()
+                .statusCode(422)
+                .body("type", equalTo("/erros/idade-minima-nao-atendida"));
+    }
+
+    @Test
+    void deveRejeitarNomeComMenosDeTresCaracteres() {
+        given()
+                .contentType(ContentType.JSON)
+                .body(requisicao("AB", "nome-" + UUID.randomUUID() + "@exemplo.com", LocalDate.of(1990, 1, 1)))
+        .when()
+                .post("/clientes")
+        .then()
+                .statusCode(400)
+                .body("type", equalTo("/erros/dados-invalidos"))
+                .body("erros[0].campo", equalTo("nome"))
+                .body("erros[0].mensagem", equalTo("O nome deve ter entre 3 e 120 caracteres."));
+    }
+
+    @Test
     void deveRejeitarDataFutura() {
         LocalDate amanha = LocalDate.now(TempoConfiguracao.FUSO_NEGOCIO).plusDays(1);
 

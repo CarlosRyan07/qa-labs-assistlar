@@ -24,6 +24,7 @@ import br.com.ryanqalabs.assistlar.cliente.aplicacao.ClienteService;
 import br.com.ryanqalabs.assistlar.cliente.dominio.StatusCliente;
 import br.com.ryanqalabs.assistlar.compartilhado.configuracao.TempoConfiguracao;
 import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoConflito;
+import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoRegraNegocio;
 
 @WebMvcTest(ClienteController.class)
 @Import(TempoConfiguracao.class)
@@ -66,7 +67,26 @@ class ClienteControllerTest {
                                 """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.type").value("/erros/dados-invalidos"))
-                .andExpect(jsonPath("$.erros.length()").value(3));
+                .andExpect(jsonPath("$.erros.length()").value(4));
+    }
+
+    @Test
+    void deveRetornarErroDeNegocioParaClienteMenorDeIdade() throws Exception {
+        when(service.cadastrar(any())).thenThrow(new ExcecaoRegraNegocio(
+                "idade-minima-nao-atendida", "O cliente deve ter pelo menos 18 anos."));
+
+        mockMvc.perform(post("/api/clientes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "nome": "Cliente Menor",
+                                  "email": "menor@exemplo.com",
+                                  "dataNascimento": "2026-07-21"
+                                }
+                                """))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.type").value("/erros/idade-minima-nao-atendida"))
+                .andExpect(jsonPath("$.detail").value("O cliente deve ter pelo menos 18 anos."));
     }
 
     @Test

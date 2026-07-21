@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import br.com.ryanqalabs.assistlar.compartilhado.configuracao.TempoConfiguracao;
 import br.com.ryanqalabs.assistlar.suporte.PostgreSqlTestContainer;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -70,8 +71,8 @@ class ContratacaoApiIT extends PostgreSqlTestContainer {
     }
 
     @Test
-    void deveRejeitarContratacaoDeClienteMenor() {
-        String clienteId = cadastrarCliente(LocalDate.now().minusYears(16));
+    void deveRejeitarContratacaoDeClienteMenorPresenteEmDadoLegado() {
+        UUID clienteId = inserirClienteMenor();
 
         given()
                 .contentType(ContentType.JSON)
@@ -136,6 +137,17 @@ class ContratacaoApiIT extends PostgreSqlTestContainer {
                 .statusCode(201)
                 .body("status", equalTo("PENDENTE"))
                 .extract().path("id");
+    }
+
+    private UUID inserirClienteMenor() {
+        UUID clienteId = UUID.randomUUID();
+        jdbcTemplate.update("""
+                INSERT INTO cliente
+                    (id, nome, email, data_nascimento, status, criado_em, atualizado_em)
+                VALUES (?, ?, ?, ?, 'ATIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                """, clienteId, "Cliente Menor Legado", clienteId + "@exemplo.com",
+                LocalDate.now(TempoConfiguracao.FUSO_NEGOCIO).minusYears(16));
+        return clienteId;
     }
 
     private void inserirSolicitacaoAberta(UUID contratacaoId) {

@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoConflito;
 import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoDadosInvalidos;
+import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoRegraNegocio;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -18,7 +19,10 @@ import jakarta.persistence.Table;
 @Table(name = "cliente")
 public class Cliente {
 
+    public static final int IDADE_MINIMA = 18;
     public static final int IDADE_MAXIMA = 120;
+    public static final int TAMANHO_MINIMO_NOME = 3;
+    public static final int TAMANHO_MAXIMO_NOME = 120;
 
     @Id
     private UUID id;
@@ -46,9 +50,20 @@ public class Cliente {
     }
 
     public static Cliente cadastrar(String nome, String email, LocalDate dataNascimento, Clock relogio) {
+        String nomeNormalizado = normalizarNome(nome);
         validarDataNascimento(dataNascimento, relogio);
-        return new Cliente(UUID.randomUUID(), nome.strip(), email.strip().toLowerCase(Locale.ROOT), dataNascimento,
+        return new Cliente(UUID.randomUUID(), nomeNormalizado, email.strip().toLowerCase(Locale.ROOT), dataNascimento,
                 Instant.now(relogio));
+    }
+
+    private static String normalizarNome(String nome) {
+        String nomeNormalizado = nome == null ? "" : nome.strip();
+        if (nomeNormalizado.length() < TAMANHO_MINIMO_NOME
+                || nomeNormalizado.length() > TAMANHO_MAXIMO_NOME) {
+            throw new ExcecaoDadosInvalidos("nome-tamanho-invalido",
+                    "O nome deve ter entre 3 e 120 caracteres.");
+        }
+        return nomeNormalizado;
     }
 
     public static void validarDataNascimento(LocalDate dataNascimento, Clock relogio) {
@@ -58,6 +73,10 @@ public class Cliente {
         }
         if (dataNascimento.isBefore(hoje.minusYears(IDADE_MAXIMA))) {
             throw new ExcecaoDadosInvalidos("idade-maxima-excedida", "A idade do cliente nao pode ser superior a 120 anos.");
+        }
+        if (dataNascimento.isAfter(hoje.minusYears(IDADE_MINIMA))) {
+            throw new ExcecaoRegraNegocio("idade-minima-nao-atendida",
+                    "O cliente deve ter pelo menos 18 anos.");
         }
     }
 

@@ -53,7 +53,16 @@ class OpenApiApiIT extends PostgreSqlTestContainer {
                 "/api/solicitacoes-assistencia/{id}/cancelamento",
                 "/api/solicitacoes-assistencia/{id}/historico");
 
+        Map<String, Object> cadastroCliente = mapa(mapa(caminhos.get("/api/clientes")).get("post"));
+        Map<String, Object> respostasCadastro = mapa(cadastroCliente.get("responses"));
+        assertThat(respostasCadastro).containsKeys("201", "400", "409", "422");
+        assertThat(mapa(mapa(respostasCadastro.get("422")).get("content")))
+                .containsKey("application/problem+json");
+
         Map<String, Object> schemas = resposta.jsonPath().getMap("components.schemas");
+        assertThat(mapa(propriedades(schemas, "ClienteCadastroRequisicao").get("nome")))
+                .containsEntry("minLength", 3)
+                .containsEntry("maxLength", 120);
         assertThat(propriedades(schemas, "ContratacaoCancelamentoRequisicao"))
                 .doesNotContainKey("tipoResponsavel");
         assertThat(propriedades(schemas, "SolicitacaoCancelamentoRequisicao"))
@@ -68,6 +77,11 @@ class OpenApiApiIT extends PostgreSqlTestContainer {
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> propriedades(Map<String, Object> schemas, String schema) {
-        return (Map<String, Object>) ((Map<String, Object>) schemas.get(schema)).get("properties");
+        return mapa(mapa(schemas.get(schema)).get("properties"));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> mapa(Object valor) {
+        return (Map<String, Object>) valor;
     }
 }
