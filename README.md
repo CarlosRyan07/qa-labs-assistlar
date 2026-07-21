@@ -137,8 +137,21 @@ O MVP não possui autenticação. UUID é identificador, nunca mecanismo de auto
 ./mvnw verify
 ```
 
-- `mvn test`: testes `*Test`, com regras unitárias e camada HTTP rápida;
-- `mvn verify`: suíte completa, incluindo `*IT` e `*ApiIT` com PostgreSQL real;
+### Convenção de nomes do Maven
+
+O projeto usa a convenção do Maven para separar testes rápidos de testes que dependem de infraestrutura:
+
+| Sufixo da classe | Executor Maven | Finalidade | Exemplos |
+|---|---|---|---|
+| `*Test` | Surefire | Testes unitários, de domínio e da camada HTTP rápida com MockMvc | `ClienteTest`, `ClienteControllerTest` |
+| `*IT` | Failsafe | Testes de integração com banco, migrations e concorrência | `MigracoesBancoIT`, `ContratacaoConcorrenciaIT` |
+| `*ApiIT` | Failsafe | Especialização de `*IT` para jornadas pela API REST | `ClienteApiIT`, `OpenApiApiIT` |
+
+`ApiIT` não é um padrão separado do Maven: essas classes também terminam em `IT` e, por isso, são encontradas pelo Failsafe. O nome adicional apenas deixa explícito que o teste atravessa a interface HTTP.
+
+- `mvn test`: o Surefire executa somente a suíte rápida `*Test`;
+- `mvn verify`: executa os `*Test` pelo Surefire e depois os `*IT`/`*ApiIT` pelo Failsafe, usando PostgreSQL real iniciado pelo Testcontainers;
+- essa separação permite obter feedback rápido durante o desenvolvimento e ainda manter uma validação completa antes de commits e entregas;
 - JaCoCo: mínimo de 80% de instruções e 70% de branches no código relevante;
 - relatório local: `target/site/jacoco/index.html` após `verify`.
 
