@@ -147,6 +147,10 @@ Erros de validação informam o campo e a mensagem no array `erros`. Exemplo: `{
 
 O MVP não possui autenticação. UUID é identificador, nunca mecanismo de autorização. Uma [jornada manual reproduzível](docs/jornada-principal.md) complementa o Swagger.
 
+### Postman
+
+A pasta [`postman`](postman/README.md) contém uma collection importável com 31 requisições, ambiente local, captura automática de UUIDs e verificações de status e regras de negócio. Ela cobre a jornada principal e cenários negativos sem exigir cópia manual dos identificadores.
+
 ## Testes e quality gate
 
 ```bash

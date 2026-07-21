@@ -1,0 +1,798 @@
+{
+  "info": {
+    "_postman_id": "8d7aa4ac-d806-4f79-8bdb-8a871f71ec7d",
+    "name": "Ryan QA Labs — AssistLar",
+    "description": "Collection do MVP AssistLar. Execute na ordem para percorrer a jornada principal e validar cenarios negativos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "00 - Operacional",
+      "item": [
+        {
+          "name": "Consultar health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/actuator/health",
+            "description": "Confirma que a aplicacao e suas dependencias estao disponiveis."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Health responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Aplicacao esta UP', () => pm.expect(pm.response.json().status).to.eql('UP'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Consultar contrato OpenAPI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/v3/api-docs",
+            "description": "Retorna o contrato OpenAPI consumido pelo Swagger e pelos testes de contrato."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('OpenAPI responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Contrato possui caminhos', () => pm.expect(pm.response.json().paths).to.be.an('object').and.not.empty);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 - Jornada principal",
+      "description": "Execute esta pasta na ordem. Os scripts criam dados unicos e armazenam os UUIDs automaticamente.",
+      "item": [
+        {
+          "name": "01 - Listar planos e capturar UUIDs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/planos"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Planos respondem 200', () => pm.response.to.have.status(200));",
+                  "const planos = pm.response.json();",
+                  "const completo = planos.find(plano => plano.codigo === 'COMPLETO');",
+                  "const essencial = planos.find(plano => plano.codigo === 'ESSENCIAL');",
+                  "pm.test('Planos iniciais existem', () => { pm.expect(completo).to.exist; pm.expect(essencial).to.exist; });",
+                  "pm.collectionVariables.set('planoId', completo.id);",
+                  "pm.collectionVariables.set('planoEssencialId', essencial.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 - Consultar plano COMPLETO",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/planos/{{planoId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Plano responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Plano e COMPLETO', () => pm.expect(pm.response.json().codigo).to.eql('COMPLETO'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03 - Cadastrar cliente",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const identificador = pm.variables.replaceIn('{{$guid}}');",
+                  "pm.collectionVariables.set('emailTeste', `portfolio+${identificador}@example.com`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Cadastro responde 201', () => pm.response.to.have.status(201));",
+                  "const cliente = pm.response.json();",
+                  "pm.collectionVariables.set('clienteId', cliente.id);",
+                  "pm.test('Cliente inicia ATIVO', () => pm.expect(cliente.status).to.eql('ATIVO'));",
+                  "pm.test('Location foi informado', () => pm.expect(pm.response.headers.get('Location')).to.include(cliente.id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Cliente Portfolio\",\n  \"email\": \"{{emailTeste}}\",\n  \"dataNascimento\": \"1990-05-10\"\n}"
+            },
+            "url": "{{baseUrl}}/api/clientes"
+          }
+        },
+        {
+          "name": "04 - Consultar cliente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/clientes/{{clienteId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Consulta responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('UUID corresponde ao cadastro', () => pm.expect(pm.response.json().id).to.eql(pm.collectionVariables.get('clienteId')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05 - Inativar cliente",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/clientes/{{clienteId}}/inativacao"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Inativacao responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Cliente ficou INATIVO', () => pm.expect(pm.response.json().status).to.eql('INATIVO'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "06 - Consultar inelegibilidade por cliente inativo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/elegibilidades?clienteId={{clienteId}}&planoId={{planoId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Elegibilidade responde 200', () => pm.response.to.have.status(200));",
+                  "const resultado = pm.response.json();",
+                  "pm.test('Cliente esta inelegivel', () => pm.expect(resultado.elegivel).to.eql(false));",
+                  "pm.test('Motivo e cliente inativo', () => pm.expect(resultado.motivos).to.include('CLIENTE_INATIVO'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07 - Reativar cliente",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/clientes/{{clienteId}}/reativacao"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Reativacao responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Cliente ficou ATIVO', () => pm.expect(pm.response.json().status).to.eql('ATIVO'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "08 - Consultar elegibilidade positiva",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/elegibilidades?clienteId={{clienteId}}&planoId={{planoId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Elegibilidade responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Cliente esta elegivel', () => pm.expect(pm.response.json().elegivel).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "09 - Criar contratacao pendente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": \"{{clienteId}}\",\n  \"planoId\": \"{{planoId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/contratacoes"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Contratacao responde 201', () => pm.response.to.have.status(201));",
+                  "const contratacao = pm.response.json();",
+                  "pm.collectionVariables.set('contratacaoId', contratacao.id);",
+                  "pm.test('Contratacao inicia PENDENTE', () => pm.expect(contratacao.status).to.eql('PENDENTE'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "10 - Consultar contratacao",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contratacoes/{{contratacaoId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Consulta responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Contratacao esta PENDENTE', () => pm.expect(pm.response.json().status).to.eql('PENDENTE'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11 - Ativar contratacao",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/contratacoes/{{contratacaoId}}/ativacao"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Ativacao responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Contratacao ficou ATIVA', () => pm.expect(pm.response.json().status).to.eql('ATIVA'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "12 - Rejeitar ativacao repetida",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/contratacoes/{{contratacaoId}}/ativacao"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Transicao invalida responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Resposta usa ProblemDetail', () => pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "13 - Consultar historico da contratacao",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contratacoes/{{contratacaoId}}/historico"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Historico responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Historico contem PENDENTE e ATIVA', () => pm.expect(pm.response.json().map(item => item.statusNovo)).to.eql(['PENDENTE', 'ATIVA']));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "14 - Abrir solicitacao para cancelar aberta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contratacaoId\": \"{{contratacaoId}}\",\n  \"tipoAssistencia\": \"ELETRICISTA\",\n  \"descricaoProblema\": \"Tomada sem energia\"\n}"
+            },
+            "url": "{{baseUrl}}/api/solicitacoes-assistencia"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Abertura responde 201', () => pm.response.to.have.status(201));",
+                  "const solicitacao = pm.response.json();",
+                  "pm.collectionVariables.set('solicitacaoId', solicitacao.id);",
+                  "pm.test('Solicitacao inicia ABERTA', () => pm.expect(solicitacao.status).to.eql('ABERTA'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "15 - Consultar solicitacao",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/solicitacoes-assistencia/{{solicitacaoId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Consulta responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Solicitacao esta ABERTA', () => pm.expect(pm.response.json().status).to.eql('ABERTA'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "16 - Cancelar solicitacao aberta sem motivo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": "{{baseUrl}}/api/solicitacoes-assistencia/{{solicitacaoId}}/cancelamento"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Cancelamento responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Solicitacao ficou CANCELADA', () => pm.expect(pm.response.json().status).to.eql('CANCELADA'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "17 - Abrir nova solicitacao para atendimento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contratacaoId\": \"{{contratacaoId}}\",\n  \"tipoAssistencia\": \"ELETRICISTA\",\n  \"descricaoProblema\": \"Disjuntor desarmando\"\n}"
+            },
+            "url": "{{baseUrl}}/api/solicitacoes-assistencia"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Abertura responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('solicitacaoId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "18 - Iniciar atendimento",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/solicitacoes-assistencia/{{solicitacaoId}}/inicio"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Inicio responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Solicitacao esta EM_ATENDIMENTO', () => pm.expect(pm.response.json().status).to.eql('EM_ATENDIMENTO'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "19 - Rejeitar cancelamento em atendimento sem motivo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": "{{baseUrl}}/api/solicitacoes-assistencia/{{solicitacaoId}}/cancelamento"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Motivo ausente responde 422', () => pm.response.to.have.status(422));",
+                  "pm.test('Erro esperado foi retornado', () => pm.expect(pm.response.json().type).to.eql('/erros/motivo-cancelamento-obrigatorio'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "20 - Cancelar atendimento com motivo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Cliente solicitou o cancelamento\"\n}"
+            },
+            "url": "{{baseUrl}}/api/solicitacoes-assistencia/{{solicitacaoId}}/cancelamento"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Cancelamento responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Solicitacao ficou CANCELADA', () => pm.expect(pm.response.json().status).to.eql('CANCELADA'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "21 - Abrir solicitacao para concluir",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contratacaoId\": \"{{contratacaoId}}\",\n  \"tipoAssistencia\": \"ELETRICISTA\",\n  \"descricaoProblema\": \"Lampada piscando\"\n}"
+            },
+            "url": "{{baseUrl}}/api/solicitacoes-assistencia"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Abertura responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('solicitacaoId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "22 - Iniciar solicitacao final",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/solicitacoes-assistencia/{{solicitacaoId}}/inicio"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Inicio responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Solicitacao esta EM_ATENDIMENTO', () => pm.expect(pm.response.json().status).to.eql('EM_ATENDIMENTO'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "23 - Concluir solicitacao",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/solicitacoes-assistencia/{{solicitacaoId}}/conclusao"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Conclusao responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Solicitacao ficou CONCLUIDA', () => pm.expect(pm.response.json().status).to.eql('CONCLUIDA'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "24 - Consultar historico da solicitacao",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/solicitacoes-assistencia/{{solicitacaoId}}/historico"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Historico responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Historico contem toda a jornada', () => pm.expect(pm.response.json().map(item => item.statusNovo)).to.eql(['ABERTA', 'EM_ATENDIMENTO', 'CONCLUIDA']));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "25 - Cancelar contratacao",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Jornada de portfolio concluida\"\n}"
+            },
+            "url": "{{baseUrl}}/api/contratacoes/{{contratacaoId}}/cancelamento"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Cancelamento responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Contratacao ficou CANCELADA', () => pm.expect(pm.response.json().status).to.eql('CANCELADA'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "26 - Consultar historico final da contratacao",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contratacoes/{{contratacaoId}}/historico"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Historico responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Historico contem toda a jornada', () => pm.expect(pm.response.json().map(item => item.statusNovo)).to.eql(['PENDENTE', 'ATIVA', 'CANCELADA']));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 - Cenarios negativos de cliente",
+      "item": [
+        {
+          "name": "Rejeitar cliente nascido hoje",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const hoje = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });",
+                  "pm.collectionVariables.set('dataHoje', hoje);",
+                  "pm.collectionVariables.set('emailNegativo', `negativo+${pm.variables.replaceIn('{{$guid}}')}@example.com`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Menor responde 422', () => pm.response.to.have.status(422));",
+                  "pm.test('Erro de idade minima', () => pm.expect(pm.response.json().type).to.eql('/erros/idade-minima-nao-atendida'));",
+                  "pm.test('Detail esperado', () => pm.expect(pm.response.json().detail).to.eql('O cliente deve ter pelo menos 18 anos.'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Cliente Hoje\",\n  \"email\": \"{{emailNegativo}}\",\n  \"dataNascimento\": \"{{dataHoje}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/clientes"
+          }
+        },
+        {
+          "name": "Rejeitar nome curto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"AB\",\n  \"email\": \"nome-curto@example.com\",\n  \"dataNascimento\": \"1990-05-10\"\n}"
+            },
+            "url": "{{baseUrl}}/api/clientes"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Nome curto responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Erro aponta o nome', () => pm.expect(pm.response.json().erros.some(erro => erro.campo === 'nome')).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rejeitar e-mail invalido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Cliente Invalido\",\n  \"email\": \"email-invalido\",\n  \"dataNascimento\": \"1990-05-10\"\n}"
+            },
+            "url": "{{baseUrl}}/api/clientes"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('E-mail invalido responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Erro aponta o e-mail', () => pm.expect(pm.response.json().erros.some(erro => erro.campo === 'email')).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
