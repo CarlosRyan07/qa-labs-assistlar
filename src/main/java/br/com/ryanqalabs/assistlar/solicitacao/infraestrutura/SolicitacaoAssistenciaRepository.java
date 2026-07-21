@@ -19,4 +19,7 @@ public interface SolicitacaoAssistenciaRepository extends JpaRepository<Solicita
 
     boolean existsByContratacaoIdAndTipoAssistenciaAndStatusIn(UUID contratacaoId,
             TipoAssistencia tipoAssistencia, Collection<StatusSolicitacao> status);
+
+    long countByContratacaoIdAndTipoAssistenciaAndStatusIn(UUID contratacaoId,
+            TipoAssistencia tipoAssistencia, Collection<StatusSolicitacao> status);
 }

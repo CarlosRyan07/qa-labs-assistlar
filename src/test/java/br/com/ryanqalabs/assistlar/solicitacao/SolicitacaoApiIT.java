@@ -21,6 +21,7 @@ import io.restassured.http.ContentType;
 class SolicitacaoApiIT extends PostgreSqlTestContainer {
 
     private static final UUID PLANO_ESSENCIAL = UUID.fromString("10000000-0000-0000-0000-000000000001");
+    private static final UUID PLANO_COMPLETO = UUID.fromString("10000000-0000-0000-0000-000000000002");
 
     @LocalServerPort
     private int porta;
@@ -109,7 +110,27 @@ class SolicitacaoApiIT extends PostgreSqlTestContainer {
                 .then().statusCode(409).body("type", equalTo("/erros/solicitacao-em-andamento-existente"));
     }
 
+    @Test
+    void deveAplicarLimitesDiferentesDosPlanos() {
+        String essencial = criarContratacao(true, PLANO_ESSENCIAL);
+        concluirSolicitacao(abrirSolicitacao(essencial, "ELETRICISTA"));
+        given().contentType(ContentType.JSON).body(requisicaoSolicitacao(essencial, "ELETRICISTA"))
+                .when().post("/solicitacoes-assistencia")
+                .then().statusCode(422).body("type", equalTo("/erros/limite-esgotado"));
+
+        String completo = criarContratacao(true, PLANO_COMPLETO);
+        concluirSolicitacao(abrirSolicitacao(completo, "ELETRICISTA"));
+        concluirSolicitacao(abrirSolicitacao(completo, "ELETRICISTA"));
+        given().contentType(ContentType.JSON).body(requisicaoSolicitacao(completo, "ELETRICISTA"))
+                .when().post("/solicitacoes-assistencia")
+                .then().statusCode(422).body("type", equalTo("/erros/limite-esgotado"));
+    }
+
     private String criarContratacao(boolean ativar) {
+        return criarContratacao(ativar, PLANO_ESSENCIAL);
+    }
+
+    private String criarContratacao(boolean ativar, UUID planoId) {
         String clienteId = given()
                 .contentType(ContentType.JSON)
                 .body("""
@@ -121,13 +142,18 @@ class SolicitacaoApiIT extends PostgreSqlTestContainer {
                 .contentType(ContentType.JSON)
                 .body("""
                         {"clienteId":"%s","planoId":"%s"}
-                        """.formatted(clienteId, PLANO_ESSENCIAL))
+                        """.formatted(clienteId, planoId))
                 .when().post("/contratacoes")
                 .then().statusCode(201).extract().path("id");
         if (ativar) {
             given().when().post("/contratacoes/{id}/ativacao", contratacaoId).then().statusCode(200);
         }
         return contratacaoId;
+    }
+
+    private void concluirSolicitacao(String solicitacaoId) {
+        given().when().post("/solicitacoes-assistencia/{id}/inicio", solicitacaoId).then().statusCode(200);
+        given().when().post("/solicitacoes-assistencia/{id}/conclusao", solicitacaoId).then().statusCode(200);
     }
 
     private String abrirSolicitacao(String contratacaoId, String tipoAssistencia) {

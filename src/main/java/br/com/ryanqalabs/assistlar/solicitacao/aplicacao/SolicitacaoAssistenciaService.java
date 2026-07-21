@@ -34,6 +34,8 @@ public class SolicitacaoAssistenciaService {
 
     private static final EnumSet<StatusSolicitacao> STATUS_EM_ANDAMENTO =
             EnumSet.of(StatusSolicitacao.ABERTA, StatusSolicitacao.EM_ATENDIMENTO);
+    private static final EnumSet<StatusSolicitacao> STATUS_QUE_CONSOMEM_LIMITE =
+            EnumSet.of(StatusSolicitacao.ABERTA, StatusSolicitacao.EM_ATENDIMENTO, StatusSolicitacao.CONCLUIDA);
 
     private final SolicitacaoAssistenciaRepository repository;
     private final ContratacaoRepository contratacaoRepository;
@@ -51,7 +53,7 @@ public class SolicitacaoAssistenciaService {
 
     @Transactional
     public SolicitacaoResposta abrir(SolicitacaoCriacaoRequisicao requisicao) {
-        Contratacao contratacao = contratacaoRepository.findById(requisicao.contratacaoId())
+        Contratacao contratacao = contratacaoRepository.buscarPorIdComBloqueio(requisicao.contratacaoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "contratacao-nao-encontrada", "Contratacao nao encontrada."));
         if (contratacao.getStatus() != StatusContratacao.ATIVA) {
@@ -65,6 +67,13 @@ public class SolicitacaoAssistenciaService {
         if (repository.existsByContratacaoIdAndTipoAssistenciaAndStatusIn(requisicao.contratacaoId(),
                 requisicao.tipoAssistencia(), STATUS_EM_ANDAMENTO)) {
             throw solicitacaoDuplicada();
+        }
+        long utilizacoes = repository.countByContratacaoIdAndTipoAssistenciaAndStatusIn(requisicao.contratacaoId(),
+                requisicao.tipoAssistencia(), STATUS_QUE_CONSOMEM_LIMITE);
+        int limite = contratacao.getPlanoAssistencia().limitePara(requisicao.tipoAssistencia());
+        if (utilizacoes >= limite) {
+            throw new ExcecaoRegraNegocio("limite-esgotado",
+                    "O limite de utilizacoes para este tipo de assistencia foi esgotado.");
         }
 
         Instant instante = Instant.now(relogio);
