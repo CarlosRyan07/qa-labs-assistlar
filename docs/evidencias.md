@@ -37,7 +37,7 @@ Critérios:
 - JaCoCo acima de 80% de instruções e 70% de branches;
 - relatório disponível em `target/site/jacoco/index.html`.
 
-Baseline local: 51 testes rápidos e 28 testes de integração/API aprovados, com 97,18% de instruções e 95,71% de branches cobertos.
+Baseline local de 21/07/2026: 51 testes rápidos e 30 testes de integração/API aprovados, com 97,07% de instruções e 95,71% de branches cobertos.
 
 ## Container
 
