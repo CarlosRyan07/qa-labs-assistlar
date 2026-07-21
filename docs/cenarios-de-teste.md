@@ -6,20 +6,21 @@ Este catálogo destaca riscos do domínio e onde eles são exercitados. Os teste
 
 | ID | Cenário | Nível |
 |---|---|---|
-| CLI-01 | cadastrar menor de idade | unitário/API |
+| CLI-01 | rejeitar cliente menor de 18 anos, inclusive nascido hoje | unitário/API |
 | CLI-02 | aceitar exatamente 18 anos | unitário |
 | CLI-03 | aceitar exatamente 120 anos | unitário/API |
 | CLI-04 | rejeitar 120 anos e um dia | unitário/API |
 | CLI-05 | rejeitar data futura | unitário/API |
 | CLI-06 | normalizar e-mail e impedir duplicidade case-insensitive | integração/API |
-| CLI-07 | inativar e reativar | unitário/API |
+| CLI-07 | rejeitar nome com menos de 3 caracteres úteis | unitário/API |
+| CLI-08 | inativar e reativar | unitário/API |
 
 ## Elegibilidade
 
 | ID | Cenário | Nível |
 |---|---|---|
 | ELE-01 | cliente ativo e adulto elegível | unitário/API |
-| ELE-02 | menor inelegível considerando a data completa | unitário |
+| ELE-02 | manter defesa de elegibilidade para menor presente em dado legado | unitário/integração |
 | ELE-03 | acumular cliente inativo, menor, plano inativo e contratação vigente | unitário |
 | ELE-04 | retornar `200` com `elegivel=false` | controller/API |
 | ELE-05 | consultar sem persistir contratação ou histórico | integração |

@@ -28,7 +28,8 @@ Os planos são carregados por migration:
 
 Regras centrais:
 
-- cliente pode ser menor de idade, mas precisa ter 18 anos completos para contratar;
+- cliente precisa ter entre 18 e 120 anos para ser cadastrado;
+- nome do cliente deve ter entre 3 e 120 caracteres úteis;
 - data de nascimento futura ou idade superior a 120 anos é inválida;
 - só pode existir uma contratação `PENDENTE` ou `ATIVA` por cliente;
 - contratação nasce `PENDENTE` e é ativada pelo operador;
@@ -127,6 +128,16 @@ As credenciais do Compose são apenas locais e não devem ser usadas em outro am
 | `/api/solicitacoes-assistencia` | abrir, consultar, iniciar, concluir, cancelar e consultar histórico |
 
 Criações retornam `201` e `Location`. Erros seguem `application/problem+json`: `400` para entrada inválida, `404` para recurso inexistente, `409` para conflito e `422` para regra de negócio.
+
+No cadastro de clientes:
+
+| Situação | Status | Identificador do problema |
+|---|---:|---|
+| nome, e-mail, formato ou data inválida | `400` | `/erros/dados-invalidos` ou código específico da data |
+| e-mail já cadastrado | `409` | `/erros/email-ja-cadastrado` |
+| cliente menor de 18 anos | `422` | `/erros/idade-minima-nao-atendida` |
+
+Erros de validação informam o campo e a mensagem no array `erros`. Exemplo: `{"campo":"nome","mensagem":"O nome deve ter entre 3 e 120 caracteres."}`.
 
 O MVP não possui autenticação. UUID é identificador, nunca mecanismo de autorização. Uma [jornada manual reproduzível](docs/jornada-principal.md) complementa o Swagger.
 
