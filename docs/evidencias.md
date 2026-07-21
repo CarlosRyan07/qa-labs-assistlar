@@ -22,7 +22,7 @@ Baseline local de 20/07/2026: JDK 21 confirmado, Docker Engine 24.0.6 e Docker C
 
 Critério: todos os testes `*Test` aprovados.
 
-Baseline local: 48 testes rápidos aprovados.
+Baseline local: 49 testes rápidos aprovados.
 
 ## Suíte completa
 
@@ -37,7 +37,7 @@ Critérios:
 - JaCoCo acima de 80% de instruções e 70% de branches;
 - relatório disponível em `target/site/jacoco/index.html`.
 
-Baseline local: 48 testes rápidos e 26 testes de integração/API aprovados, com 97,11% de instruções e 98,39% de branches cobertos.
+Baseline local: 49 testes rápidos e 26 testes de integração/API aprovados, com 97,11% de instruções e 98,39% de branches cobertos.
 
 ## Container
 
