@@ -109,11 +109,17 @@ docker compose up -d postgres --wait
 
 No Windows, use `.\mvnw.cmd` no lugar de `./mvnw`.
 
+### Reinício automático durante o desenvolvimento
+
+O Spring Boot DevTools reinicia o contexto da aplicação quando uma alteração compilada chega ao classpath. Ao executar pelo Play da IDE, mantenha o PostgreSQL ligado, salve a alteração e deixe a IDE recompilar o projeto. O console deverá mostrar uma nova inicialização do `AssistLarApplication` sem que seja necessário usar Stop/Play manualmente.
+
+Se salvar o arquivo não provocar o reinício, habilite a compilação automática da IDE. Alterações somente em testes não reiniciam necessariamente a aplicação, e migrations já aplicadas não devem ser editadas.
+
 Com a aplicação iniciada:
 
 - Swagger UI: <http://localhost:8080/swagger-ui.html>
-- OpenAPI: <http://localhost:8080/v3/api-docs>
-- Health: <http://localhost:8080/actuator/health>
+- OpenAPI: <http://localhost:8080/v3/api-docs> — contrato JSON da API, usado pelo Swagger, por ferramentas e por testes de contrato;
+- Health: <http://localhost:8080/actuator/health> — indicador operacional que informa se a aplicação e suas dependências estão disponíveis.
 
 As credenciais do Compose são apenas locais e não devem ser usadas em outro ambiente.
 
