@@ -16,8 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import br.com.ryanqalabs.assistlar.compartilhado.configuracao.TempoConfiguracao;
 import br.com.ryanqalabs.assistlar.suporte.PostgreSqlTestContainer;
+import br.com.ryanqalabs.assistlar.suporte.TempoFixoTestesConfiguracao;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 
@@ -66,7 +66,7 @@ class ElegibilidadeApiIT extends PostgreSqlTestContainer {
                     (id, nome, email, data_nascimento, status, criado_em, atualizado_em)
                 VALUES (?, ?, ?, ?, 'ATIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                 """, clienteId, "Menor Legado", clienteId + "@exemplo.com",
-                LocalDate.now(TempoConfiguracao.FUSO_NEGOCIO).minusYears(16));
+                TempoFixoTestesConfiguracao.DATA_CIVIL_FIXA.minusYears(16));
 
         given().when().post("/clientes/{id}/inativacao", clienteId).then().statusCode(200);
 

@@ -3,12 +3,14 @@ package br.com.ryanqalabs.assistlar.suporte;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 @ResourceLock("assistlar-postgresql-compartilhado")
+@Import(TempoFixoTestesConfiguracao.class)
 public abstract class PostgreSqlTestContainer {
 
     protected static final PostgreSQLContainer POSTGRESQL = new PostgreSQLContainer(ImagemPostgreSql.IMAGEM)

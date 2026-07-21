@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Clock;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +24,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import br.com.ryanqalabs.assistlar.cliente.dominio.Cliente;
 import br.com.ryanqalabs.assistlar.cliente.infraestrutura.ClienteRepository;
 import br.com.ryanqalabs.assistlar.suporte.PostgreSqlTestContainer;
+import br.com.ryanqalabs.assistlar.suporte.TempoFixoTestesConfiguracao;
 
 @SpringBootTest
 class ContratacaoConcorrenciaIT extends PostgreSqlTestContainer {
@@ -85,7 +85,8 @@ class ContratacaoConcorrenciaIT extends PostgreSqlTestContainer {
                     INSERT INTO contratacao (
                         id, cliente_id, plano_assistencia_id, status, criada_em, versao
                     ) VALUES (?, ?, ?, 'PENDENTE', ?, 0)
-                    """, UUID.randomUUID(), clienteId, PLANO_ESSENCIAL, OffsetDateTime.now(ZoneOffset.UTC)));
+                    """, UUID.randomUUID(), clienteId, PLANO_ESSENCIAL,
+                    TempoFixoTestesConfiguracao.INSTANTE_FIXO.atOffset(ZoneOffset.UTC)));
             return ResultadoInsercao.SUCESSO;
         } catch (DataIntegrityViolationException excecao) {
             PSQLException postgres = encontrarCausaPostgreSql(excecao);

@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-import br.com.ryanqalabs.assistlar.compartilhado.configuracao.TempoConfiguracao;
 import br.com.ryanqalabs.assistlar.suporte.PostgreSqlTestContainer;
+import br.com.ryanqalabs.assistlar.suporte.TempoFixoTestesConfiguracao;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 
@@ -90,7 +90,7 @@ class ClienteApiIT extends PostgreSqlTestContainer {
 
     @Test
     void deveAceitarExatamenteCentoEVinteAnosERejeitarUmDiaAlemDoLimite() {
-        LocalDate hoje = LocalDate.now(TempoConfiguracao.FUSO_NEGOCIO);
+        LocalDate hoje = TempoFixoTestesConfiguracao.DATA_CIVIL_FIXA;
         LocalDate exatamenteCentoEVinte = hoje.minusYears(120);
         LocalDate acimaDoLimite = exatamenteCentoEVinte.minusDays(1);
 
@@ -116,7 +116,7 @@ class ClienteApiIT extends PostgreSqlTestContainer {
 
     @Test
     void deveAceitarExatamenteDezoitoAnosERejeitarMenores() {
-        LocalDate hoje = LocalDate.now(TempoConfiguracao.FUSO_NEGOCIO);
+        LocalDate hoje = TempoFixoTestesConfiguracao.DATA_CIVIL_FIXA;
         LocalDate exatamenteDezoito = hoje.minusYears(18);
         LocalDate aindaMenor = exatamenteDezoito.plusDays(1);
 
@@ -160,13 +160,13 @@ class ClienteApiIT extends PostgreSqlTestContainer {
         .then()
                 .statusCode(400)
                 .body("type", equalTo("/erros/dados-invalidos"))
-                .body("erros[0].campo", equalTo("nome"))
-                .body("erros[0].mensagem", equalTo("O nome deve ter entre 3 e 120 caracteres."));
+                .body("erros.find { it.campo == 'nome' }.mensagem",
+                        equalTo("O nome deve ter entre 3 e 120 caracteres."));
     }
 
     @Test
     void deveRejeitarDataFutura() {
-        LocalDate amanha = LocalDate.now(TempoConfiguracao.FUSO_NEGOCIO).plusDays(1);
+        LocalDate amanha = TempoFixoTestesConfiguracao.DATA_CIVIL_FIXA.plusDays(1);
 
         given()
                 .contentType(ContentType.JSON)

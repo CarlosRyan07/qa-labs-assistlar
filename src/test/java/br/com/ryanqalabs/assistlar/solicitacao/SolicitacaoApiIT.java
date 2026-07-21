@@ -48,11 +48,11 @@ class SolicitacaoApiIT extends PostgreSqlTestContainer {
                 .then()
                 .statusCode(200)
                 .body("$", hasSize(3))
-                .body("[0].statusNovo", equalTo("ABERTA"))
-                .body("[0].tipoResponsavel", equalTo("CLIENTE"))
-                .body("[1].statusNovo", equalTo("EM_ATENDIMENTO"))
-                .body("[1].tipoResponsavel", equalTo("OPERADOR"))
-                .body("[2].statusNovo", equalTo("CONCLUIDA"));
+                .body("find { it.statusNovo == 'ABERTA' }.statusNovo", equalTo("ABERTA"))
+                .body("find { it.statusNovo == 'ABERTA' }.tipoResponsavel", equalTo("CLIENTE"))
+                .body("find { it.statusNovo == 'EM_ATENDIMENTO' }.statusNovo", equalTo("EM_ATENDIMENTO"))
+                .body("find { it.statusNovo == 'EM_ATENDIMENTO' }.tipoResponsavel", equalTo("OPERADOR"))
+                .body("find { it.statusNovo == 'CONCLUIDA' }.statusNovo", equalTo("CONCLUIDA"));
     }
 
     @Test
@@ -76,7 +76,7 @@ class SolicitacaoApiIT extends PostgreSqlTestContainer {
                 .then()
                 .statusCode(200)
                 .body("$", hasSize(3))
-                .body("[2].tipoResponsavel", equalTo("OPERADOR"));
+                .body("find { it.statusNovo == 'CANCELADA' }.tipoResponsavel", equalTo("OPERADOR"));
     }
 
     @Test

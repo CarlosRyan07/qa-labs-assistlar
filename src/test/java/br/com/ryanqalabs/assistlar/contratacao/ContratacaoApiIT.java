@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
 
@@ -17,8 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import br.com.ryanqalabs.assistlar.compartilhado.configuracao.TempoConfiguracao;
 import br.com.ryanqalabs.assistlar.suporte.PostgreSqlTestContainer;
+import br.com.ryanqalabs.assistlar.suporte.TempoFixoTestesConfiguracao;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 
@@ -58,13 +57,13 @@ class ContratacaoApiIT extends PostgreSqlTestContainer {
                 .then()
                 .statusCode(200)
                 .body("$", hasSize(3))
-                .body("[0].statusAnterior", equalTo(null))
-                .body("[0].statusNovo", equalTo("PENDENTE"))
-                .body("[0].tipoResponsavel", equalTo("CLIENTE"))
-                .body("[1].statusNovo", equalTo("ATIVA"))
-                .body("[1].tipoResponsavel", equalTo("OPERADOR"))
-                .body("[2].statusNovo", equalTo("CANCELADA"))
-                .body("[2].motivo", equalTo("Solicitado pelo cliente"));
+                .body("find { it.statusNovo == 'PENDENTE' }.statusAnterior", equalTo(null))
+                .body("find { it.statusNovo == 'PENDENTE' }.statusNovo", equalTo("PENDENTE"))
+                .body("find { it.statusNovo == 'PENDENTE' }.tipoResponsavel", equalTo("CLIENTE"))
+                .body("find { it.statusNovo == 'ATIVA' }.statusNovo", equalTo("ATIVA"))
+                .body("find { it.statusNovo == 'ATIVA' }.tipoResponsavel", equalTo("OPERADOR"))
+                .body("find { it.statusNovo == 'CANCELADA' }.statusNovo", equalTo("CANCELADA"))
+                .body("find { it.statusNovo == 'CANCELADA' }.motivo", equalTo("Solicitado pelo cliente"));
 
         String novaContratacaoId = criarContratacao(clienteId, PLANO_ESSENCIAL);
         assertThat(novaContratacaoId).isNotEqualTo(contratacaoId);
@@ -146,7 +145,7 @@ class ContratacaoApiIT extends PostgreSqlTestContainer {
                     (id, nome, email, data_nascimento, status, criado_em, atualizado_em)
                 VALUES (?, ?, ?, ?, 'ATIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                 """, clienteId, "Cliente Menor Legado", clienteId + "@exemplo.com",
-                LocalDate.now(TempoConfiguracao.FUSO_NEGOCIO).minusYears(16));
+                TempoFixoTestesConfiguracao.DATA_CIVIL_FIXA.minusYears(16));
         return clienteId;
     }
 
@@ -155,6 +154,7 @@ class ContratacaoApiIT extends PostgreSqlTestContainer {
                 INSERT INTO solicitacao_assistencia (
                     id, contratacao_id, tipo_assistencia, descricao_problema, status, aberta_em, versao
                 ) VALUES (?, ?, 'ELETRICISTA', 'Tomada sem energia', 'ABERTA', ?, 0)
-                """, UUID.randomUUID(), contratacaoId, OffsetDateTime.now(ZoneOffset.UTC));
+                """, UUID.randomUUID(), contratacaoId,
+                TempoFixoTestesConfiguracao.INSTANTE_FIXO.atOffset(ZoneOffset.UTC));
     }
 }
