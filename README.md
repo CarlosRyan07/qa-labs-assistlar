@@ -151,6 +151,32 @@ O MVP não possui autenticação. UUID é identificador, nunca mecanismo de auto
 
 A pasta [`postman`](postman/README.md) contém uma collection importável com 31 requisições, ambiente local, captura automática de UUIDs e verificações de status e regras de negócio. Ela cobre a jornada principal e cenários negativos sem exigir cópia manual dos identificadores.
 
+## Estratégia de testes
+
+A suíte foi organizada em camadas para equilibrar feedback rápido, fidelidade ao ambiente real e cobertura dos riscos de negócio.
+
+| Camada | Ferramentas | O que é validado |
+|---|---|---|
+| Domínio e regras | JUnit 5 e AssertJ | Idade, elegibilidade, cobertura, limites e transições de estado |
+| Controllers | `@WebMvcTest`, MockMvc e Mockito | Rotas, payloads, status HTTP, headers, validações e respostas `ProblemDetail`, sem iniciar servidor real |
+| Integração | Spring Boot Test, Testcontainers, PostgreSQL e Flyway | Mapeamentos JPA, migrations, constraints, transações, histórico e persistência real |
+| API | REST Assured e `@SpringBootTest` em porta aleatória | Jornadas HTTP completas atravessando controller, aplicação, domínio e banco |
+| Concorrência | JUnit 5, `CountDownLatch` e PostgreSQL | Unicidade, locking, conflitos simultâneos e consistência final do banco |
+| Contrato | REST Assured e Springdoc OpenAPI | Disponibilidade do contrato OpenAPI 3.1 e presença dos caminhos públicos esperados |
+| Cobertura | JaCoCo | Quality gate de instruções e branches no código relevante |
+| Testes manuais | Postman e Swagger UI | Exploração reproduzível da API, fluxos positivos e respostas negativas |
+
+Decisões da estratégia:
+
+- MockMvc testa rapidamente a camada HTTP; os casos de uso chamados pelos controllers são isolados com `@MockitoBean`;
+- REST Assured é reservado às jornadas críticas e aos testes de contrato, evitando duplicar toda a suíte do MockMvc;
+- os testes de integração utilizam a mesma imagem PostgreSQL `postgres:17.10-alpine3.24` adotada no Docker Compose;
+- H2 não é utilizado, reduzindo diferenças entre o comportamento dos testes e o banco da aplicação;
+- entidades e regras de domínio são exercitadas diretamente, sem mocks desnecessários;
+- antes de cada teste de integração, apenas os dados mutáveis são limpos; migrations, planos e coberturas de referência são preservados;
+- testes concorrentes usam barreiras determinísticas e timeout, nunca `Thread.sleep`;
+- Surefire executa os 51 testes rápidos, enquanto Failsafe complementa a execução com 30 testes de integração/API.
+
 ## Testes e quality gate
 
 ```bash
