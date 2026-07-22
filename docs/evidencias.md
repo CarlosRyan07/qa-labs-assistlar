@@ -70,3 +70,14 @@ Os testes usam `CountDownLatch`, timeout e inspeção do estado final do banco, 
 ## Jornada principal
 
 A jornada documentada foi reproduzida no ambiente do Compose: cliente elegível, contratação `PENDENTE → ATIVA` e solicitação `ABERTA → EM_ATENDIMENTO → CONCLUIDA`, com os três registros no histórico.
+
+## Evidências visuais
+
+As imagens complementam os comandos reproduzíveis e registram a validação visual do MVP:
+
+- [Swagger e contrato da API](assets/swagger-api.png)
+- [Jornada principal no Postman](assets/postman-jornada-principal.png)
+- [Cenário negativo com ProblemDetail](assets/postman-problem-detail.png)
+- [Resultado agregado da suíte](assets/testes-81-build-success.png)
+- [Cobertura JaCoCo](assets/jacoco-cobertura.png)
+- [Docker Compose saudável](assets/docker-compose-healthy.png)

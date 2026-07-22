@@ -184,6 +184,67 @@ Exemplo de diagnóstico de uma integração específica no PowerShell:
 
 A execução específica não substitui o `mvn verify` obrigatório. Consulte o [catálogo de cenários](docs/cenarios-de-teste.md) e as [evidências reproduzíveis](docs/evidencias.md).
 
+## Evidências do MVP
+
+### API documentada
+
+O contrato OpenAPI 3.1 publica 18 caminhos para clientes, planos, elegibilidade, contratações, solicitações e históricos.
+
+<details>
+<summary>Ver Swagger UI com os recursos do AssistLar</summary>
+
+![Swagger UI com os recursos do AssistLar](docs/assets/swagger-api.png)
+
+</details>
+
+### Testes manuais e de API
+
+A collection Postman possui 31 requisições, com jornadas positivas, cenários negativos, variáveis dinâmicas e scripts de validação.
+
+<details>
+<summary>Ver evidências do Postman</summary>
+
+![Jornada principal executada no Postman](docs/assets/postman-jornada-principal.png)
+
+![Resposta ProblemDetail validada no Postman](docs/assets/postman-problem-detail.png)
+
+</details>
+
+### Suíte automatizada
+
+A suíte completa possui 81 testes: 51 rápidos e 30 de integração/API.
+
+<details>
+<summary>Ver resultado da suíte Maven</summary>
+
+![81 testes aprovados na suíte Maven](docs/assets/testes-81-build-success.png)
+
+</details>
+
+### Cobertura
+
+O JaCoCo registrou 97,07% de instruções e 95,71% de branches, acima do quality gate configurado.
+
+<details>
+<summary>Ver relatório de cobertura JaCoCo</summary>
+
+![Relatório de cobertura JaCoCo](docs/assets/jacoco-cobertura.png)
+
+</details>
+
+### Ambiente reproduzível
+
+A aplicação e o PostgreSQL são iniciados pelo Docker Compose com health checks.
+
+<details>
+<summary>Ver serviços saudáveis no Docker Compose</summary>
+
+![Aplicação e PostgreSQL saudáveis](docs/assets/docker-compose-healthy.png)
+
+</details>
+
+Os comandos, critérios e resultados completos estão nas [evidências reproduzíveis](docs/evidencias.md).
+
 ## Decisões de qualidade
 
 - datas civis usam `Clock` e `America/Sao_Paulo`;
