@@ -42,7 +42,9 @@ Estas regras valem para todo o repositorio e para todos os marcos do MVP.
 
 ## Git e commits
 
-- Trabalhe na branch `feat/mvp-assistlar`.
+- A branch `main` representa a versao estavel e nao deve receber commits diretos.
+- Realize novas alteracoes em branches especificas, usando prefixos coerentes como `feat/`, `fix/`, `docs/`, `test/` e `ci/`.
+- Integre alteracoes na `main` por meio de Pull Request.
 - Use Conventional Commits com tipo em ingles e descricao em portugues.
 - Revise o diff antes de cada commit.
 - Nao crie commit com build ou testes relacionados falhando.
