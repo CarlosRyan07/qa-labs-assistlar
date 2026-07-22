@@ -1,6 +1,6 @@
 # Ryan QA Labs — AssistLar
 
-Plataforma fictícia de assistências residenciais criada para aprender e demonstrar práticas de Quality Engineering em uma aplicação controlada, autoral e próxima de um produto real.
+Plataforma fictícia de assistências residenciais desenvolvida para demonstrar práticas de Quality Engineering em uma aplicação autoral, controlada e próxima de um produto real.
 
 > Este projeto é exclusivamente educacional. Não representa nem reproduz sistemas, dados, nomes ou regras de empresas reais.
 
@@ -216,58 +216,33 @@ A execução específica não substitui o `mvn verify` obrigatório. Consulte o 
 
 O contrato OpenAPI 3.1 publica 18 caminhos para clientes, planos, elegibilidade, contratações, solicitações e históricos.
 
-<details>
-<summary>Ver Swagger UI com os recursos do AssistLar</summary>
-
 ![Swagger UI com os recursos do AssistLar](docs/assets/swagger-api.png)
-
-</details>
 
 ### Testes manuais e de API
 
 A collection Postman possui 31 requisições, com jornadas positivas, cenários negativos, variáveis dinâmicas e scripts de validação.
 
-<details>
-<summary>Ver evidências do Postman</summary>
-
 ![Jornada principal executada no Postman](docs/assets/postman-jornada-principal.png)
 
 ![Resposta ProblemDetail validada no Postman](docs/assets/postman-problem-detail.png)
-
-</details>
 
 ### Suíte automatizada
 
 A suíte completa possui 81 testes: 51 rápidos e 30 de integração/API.
 
-<details>
-<summary>Ver resultado da suíte Maven</summary>
-
 ![81 testes aprovados na suíte Maven](docs/assets/testes-81-build-success.png)
-
-</details>
 
 ### Cobertura
 
 O JaCoCo registrou 97,07% de instruções e 95,71% de branches, acima do quality gate configurado.
 
-<details>
-<summary>Ver relatório de cobertura JaCoCo</summary>
-
 ![Relatório de cobertura JaCoCo](docs/assets/jacoco-cobertura.png)
-
-</details>
 
 ### Ambiente reproduzível
 
 A aplicação e o PostgreSQL são iniciados pelo Docker Compose com health checks.
 
-<details>
-<summary>Ver serviços saudáveis no Docker Compose</summary>
-
 ![Aplicação e PostgreSQL saudáveis](docs/assets/docker-compose-healthy.png)
-
-</details>
 
 Os comandos, critérios e resultados completos estão nas [evidências reproduzíveis](docs/evidencias.md).
 
@@ -285,10 +260,10 @@ Os comandos, critérios e resultados completos estão nas [evidências reproduz�
 
 React, autenticação, Playwright, Cypress, Selenium, acessibilidade web, k6, JMeter, GitHub Actions, notificações, rede de prestadores, geolocalização, agendamento, pagamento, sinistro, corretor, vigência, cloud e microsserviços.
 
-Evoluções prioritárias: interface React com Playwright, testes de performance com k6, segurança básica e pipeline no GitHub Actions.
+Evoluções prioritárias: pipeline no GitHub Actions, interface React com Playwright, testes de performance com k6 e segurança básica.
 
 ## Repositório e licença
 
-Slug planejado: `ryan-qa-labs-assistlar`.
+Este projeto integra o portfólio **Ryan QA Labs**.
 
 Distribuído sob a licença MIT.
