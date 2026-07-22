@@ -1,5 +1,7 @@
 # Ryan QA Labs — AssistLar
 
+[![CI](https://github.com/CarlosRyan07/ryan-qa-labs-assistlar/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/CarlosRyan07/ryan-qa-labs-assistlar/actions/workflows/ci.yml)
+
 Plataforma fictícia de assistências residenciais desenvolvida para demonstrar práticas de Quality Engineering em uma aplicação autoral, controlada e próxima de um produto real.
 
 > Este projeto é exclusivamente educacional. Não representa nem reproduz sistemas, dados, nomes ou regras de empresas reais.
@@ -65,6 +67,7 @@ Módulos: `cliente`, `plano`, `elegibilidade`, `contratacao`, `solicitacao`, `hi
 - JUnit 5, Mockito e MockMvc;
 - Testcontainers 2.0.5 e REST Assured 6.0.0;
 - JaCoCo e Maven Enforcer;
+- GitHub Actions;
 - Docker e Docker Compose.
 
 ## Pré-requisitos
@@ -210,6 +213,14 @@ Exemplo de diagnóstico de uma integração específica no PowerShell:
 
 A execução específica não substitui o `mvn verify` obrigatório. Consulte o [catálogo de cenários](docs/cenarios-de-teste.md) e as [evidências reproduzíveis](docs/evidencias.md).
 
+## Integração contínua
+
+A pipeline de CI está configurada para executar em Pull Requests direcionados à `main`, em pushes na `main` e manualmente pelo GitHub Actions. O job utiliza Java 21 Temurin e o Maven Wrapper para executar `clean verify` em um runner Linux com Docker disponível.
+
+Durante a validação, o PostgreSQL real é iniciado pelo Testcontainers, sem service container ou banco alternativo. O Maven executa os testes rápidos pelo Surefire, os testes de integração e API pelo Failsafe e o quality gate de cobertura pelo JaCoCo.
+
+Ao final de cada execução, mesmo em caso de falha, os relatórios do Surefire, Failsafe e JaCoCo são disponibilizados no artefato `quality-reports` por 14 dias. A configuração está em [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+
 ## Evidências do MVP
 
 ### API documentada
@@ -258,9 +269,9 @@ Os comandos, critérios e resultados completos estão nas [evidências reproduz�
 
 ## Fora do MVP
 
-React, autenticação, Playwright, Cypress, Selenium, acessibilidade web, k6, JMeter, GitHub Actions, notificações, rede de prestadores, geolocalização, agendamento, pagamento, sinistro, corretor, vigência, cloud e microsserviços.
+React, autenticação, Playwright, Cypress, Selenium, acessibilidade web, k6, JMeter, notificações, rede de prestadores, geolocalização, agendamento, pagamento, sinistro, corretor, vigência, cloud e microsserviços.
 
-Evoluções prioritárias: pipeline no GitHub Actions, interface React com Playwright, testes de performance com k6 e segurança básica.
+Evoluções prioritárias: interface React com Playwright, testes de performance com k6 e segurança básica.
 
 ## Repositório e licença
 
