@@ -1,0 +1,14 @@
+INSERT INTO plano_assistencia (id, codigo, nome, descricao, ativo, criado_em)
+VALUES
+    ('10000000-0000-0000-0000-000000000001', 'ESSENCIAL', 'Plano Essencial',
+     'Cobertura residencial essencial para eletricista e encanador.', TRUE, CURRENT_TIMESTAMP),
+    ('10000000-0000-0000-0000-000000000002', 'COMPLETO', 'Plano Completo',
+     'Cobertura residencial ampliada com eletricista, encanador e chaveiro.', TRUE, CURRENT_TIMESTAMP);
+
+INSERT INTO cobertura_assistencia (id, plano_assistencia_id, tipo_assistencia, limite_utilizacoes)
+VALUES
+    ('20000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'ELETRICISTA', 1),
+    ('20000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001', 'ENCANADOR', 1),
+    ('20000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000002', 'ELETRICISTA', 2),
+    ('20000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000002', 'ENCANADOR', 2),
+    ('20000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000002', 'CHAVEIRO', 1);

@@ -12,6 +12,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -44,6 +45,12 @@ public class ManipuladorGlobalExcecoes {
                 excecao.getMessage(), requisicao, List.of());
     }
 
+    @ExceptionHandler(ExcecaoDadosInvalidos.class)
+    ResponseEntity<ProblemDetail> dadosInvalidos(ExcecaoDadosInvalidos excecao, HttpServletRequest requisicao) {
+        return resposta(HttpStatus.BAD_REQUEST, excecao.getCodigo(), "Dados invalidos",
+                excecao.getMessage(), requisicao, List.of());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<ProblemDetail> validacao(MethodArgumentNotValidException excecao, HttpServletRequest requisicao) {
         List<ErroValidacao> erros = excecao.getBindingResult().getFieldErrors().stream()
@@ -53,7 +60,8 @@ public class ManipuladorGlobalExcecoes {
                 "Um ou mais campos estao invalidos.", requisicao, erros);
     }
 
-    @ExceptionHandler({HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class})
+    @ExceptionHandler({HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class,
+            MissingServletRequestParameterException.class})
     ResponseEntity<ProblemDetail> requisicaoInvalida(Exception excecao, HttpServletRequest requisicao) {
         return resposta(HttpStatus.BAD_REQUEST, "requisicao-invalida", "Requisicao invalida",
                 "O formato ou um parametro da requisicao e invalido.", requisicao, List.of());
