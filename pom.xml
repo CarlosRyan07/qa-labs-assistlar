@@ -13,7 +13,7 @@
 
     <groupId>br.com.ryanqalabs</groupId>
     <artifactId>assistlar</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0</version>
     <name>AssistLar</name>
     <description>Plataforma ficticia de assistencias residenciais para estudo de Quality Engineering</description>
 
