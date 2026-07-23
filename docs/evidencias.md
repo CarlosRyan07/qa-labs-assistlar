@@ -71,6 +71,10 @@ Os testes usam `CountDownLatch`, timeout e inspeção do estado final do banco, 
 
 A jornada documentada foi reproduzida no ambiente do Compose: cliente elegível, contratação `PENDENTE → ATIVA` e solicitação `ABERTA → EM_ATENDIMENTO → CONCLUIDA`, com os três registros no histórico.
 
+## Integração contínua
+
+O workflow de CI foi validado durante o Pull Request e novamente após o merge na `main`. As duas execuções utilizaram Java 21 e o Maven Wrapper para executar `clean verify`, iniciaram o PostgreSQL dos testes pelo Testcontainers e publicaram os relatórios do Surefire, Failsafe e JaCoCo no artefato `quality-reports`.
+
 ## Evidências visuais
 
 As imagens complementam os comandos reproduzíveis e registram a validação visual do MVP:
@@ -81,3 +85,4 @@ As imagens complementam os comandos reproduzíveis e registram a validação vis
 - [Resultado agregado da suíte](assets/testes-81-build-success.png)
 - [Cobertura JaCoCo](assets/jacoco-cobertura.png)
 - [Docker Compose saudável](assets/docker-compose-healthy.png)
+- [Pipeline de qualidade aprovada no GitHub Actions](assets/github-actions-ci-aprovada.png)

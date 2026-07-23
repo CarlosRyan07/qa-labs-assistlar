@@ -215,11 +215,18 @@ A execução específica não substitui o `mvn verify` obrigatório. Consulte o 
 
 ## Integração contínua
 
-A pipeline de CI está configurada para executar em Pull Requests direcionados à `main`, em pushes na `main` e manualmente pelo GitHub Actions. O job utiliza Java 21 Temurin e o Maven Wrapper para executar `clean verify` em um runner Linux com Docker disponível.
+A pipeline valida Pull Requests direcionados à `main` e executa novamente após o merge, mantendo a branch principal verificada. Ela também executa em novos pushes na `main` e pode ser acionada manualmente pelo GitHub Actions. O job utiliza Java 21 Temurin e o Maven Wrapper para executar `clean verify` em um runner Linux com Docker disponível.
 
 Durante a validação, o PostgreSQL real é iniciado pelo Testcontainers, sem service container ou banco alternativo. O Maven executa os testes rápidos pelo Surefire, os testes de integração e API pelo Failsafe e o quality gate de cobertura pelo JaCoCo.
 
 Ao final de cada execução, mesmo em caso de falha, os relatórios do Surefire, Failsafe e JaCoCo são disponibilizados no artefato `quality-reports` por 14 dias. A configuração está em [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+
+<details>
+<summary>Ver execuções aprovadas no GitHub Actions</summary>
+
+![Pipeline de qualidade aprovada no Pull Request e na branch main](docs/assets/github-actions-ci-aprovada.png)
+
+</details>
 
 ## Evidências do MVP
 
