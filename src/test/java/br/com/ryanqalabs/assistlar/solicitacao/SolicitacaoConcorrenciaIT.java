@@ -103,13 +103,20 @@ class SolicitacaoConcorrenciaIT extends PostgreSqlTestContainer {
             assertThat(List.of(uma.get(10, TimeUnit.SECONDS), outra.get(10, TimeUnit.SECONDS)))
                     .containsExactlyInAnyOrder(
                             ResultadoConcorrencia.SUCESSO,
-                            ResultadoConcorrencia.CONFLITO_OTIMISTA);
+                            ResultadoConcorrencia.INICIO_REJEITADO);
         }
 
-        assertThat(solicitacaoRepository.findById(solicitacaoId).orElseThrow().getStatus())
-                .isEqualTo(StatusSolicitacao.EM_ATENDIMENTO);
-        assertThat(historicoRepository.findByTipoEntidadeAndEntidadeIdOrderByRegistradoEmAscIdAsc(
-                TipoEntidadeHistorico.SOLICITACAO_ASSISTENCIA, solicitacaoId)).hasSize(2);
+        var solicitacaoPersistida = solicitacaoRepository.findById(solicitacaoId).orElseThrow();
+        assertThat(solicitacaoPersistida.getStatus()).isEqualTo(StatusSolicitacao.EM_ATENDIMENTO);
+        assertThat(solicitacaoPersistida.getVersao()).isEqualTo(1);
+
+        var historico = historicoRepository.findByTipoEntidadeAndEntidadeIdOrderByRegistradoEmAscIdAsc(
+                TipoEntidadeHistorico.SOLICITACAO_ASSISTENCIA, solicitacaoId);
+        assertThat(historico).hasSize(2);
+        assertThat(historico)
+                .filteredOn(registro -> "ABERTA".equals(registro.getStatusAnterior())
+                        && "EM_ATENDIMENTO".equals(registro.getStatusNovo()))
+                .hasSize(1);
     }
 
     private ResultadoConcorrencia abrirConcorrente(UUID contratacaoId, CountDownLatch prontas, CountDownLatch iniciar)
@@ -131,8 +138,10 @@ class SolicitacaoConcorrenciaIT extends PostgreSqlTestContainer {
             solicitacaoService.iniciar(solicitacaoId);
             return ResultadoConcorrencia.SUCESSO;
         } catch (ExcecaoConflito excecao) {
-            assertThat(excecao.getCodigo()).isEqualTo("concorrencia-solicitacao");
-            return ResultadoConcorrencia.CONFLITO_OTIMISTA;
+            assertThat(excecao.getCodigo()).isIn(
+                    "concorrencia-solicitacao",
+                    "transicao-solicitacao-invalida");
+            return ResultadoConcorrencia.INICIO_REJEITADO;
         }
     }
 
@@ -159,6 +168,6 @@ class SolicitacaoConcorrenciaIT extends PostgreSqlTestContainer {
     private enum ResultadoConcorrencia {
         SUCESSO,
         SOLICITACAO_EM_ANDAMENTO_EXISTENTE,
-        CONFLITO_OTIMISTA
+        INICIO_REJEITADO
     }
 }
