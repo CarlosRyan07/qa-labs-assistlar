@@ -75,6 +75,12 @@ A jornada documentada foi reproduzida no ambiente do Compose: cliente elegível,
 
 O workflow de CI foi validado durante o Pull Request e novamente após o merge na `main`. As duas execuções utilizaram Java 21 e o Maven Wrapper para executar `clean verify`, iniciaram o PostgreSQL dos testes pelo Testcontainers e publicaram os relatórios do Surefire, Failsafe e JaCoCo no artefato `quality-reports`.
 
+### Teste negativo e proteção da main
+
+Uma branch temporária foi criada com um teste contendo uma falha intencional. O GitHub Actions detectou a regressão, e o check obrigatório `Build, testes e qualidade` manteve o botão de merge desabilitado. O Pull Request foi fechado e a branch temporária foi excluída sem integração na `main`.
+
+![Falha detectada pela CI e merge bloqueado](assets/github-actions-merge-bloqueado.png)
+
 ## Evidências visuais
 
 As imagens complementam os comandos reproduzíveis e registram a validação visual do MVP:
@@ -86,3 +92,4 @@ As imagens complementam os comandos reproduzíveis e registram a validação vis
 - [Cobertura JaCoCo](assets/jacoco-cobertura.png)
 - [Docker Compose saudável](assets/docker-compose-healthy.png)
 - [Pipeline de qualidade aprovada no GitHub Actions](assets/github-actions-ci-aprovada.png)
+- [Falha detectada pela CI e merge bloqueado](assets/github-actions-merge-bloqueado.png)
