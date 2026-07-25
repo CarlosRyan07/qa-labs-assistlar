@@ -1,12 +1,38 @@
 # Ryan QA Labs — AssistLar
 
 [![CI](https://github.com/CarlosRyan07/ryan-qa-labs-assistlar/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/CarlosRyan07/ryan-qa-labs-assistlar/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/CarlosRyan07/ryan-qa-labs-assistlar?label=release)](https://github.com/CarlosRyan07/ryan-qa-labs-assistlar/releases/latest)
+![Java 21](https://img.shields.io/badge/Java-21-007396?logo=openjdk&logoColor=white)
+![Spring Boot 4.1.0](https://img.shields.io/badge/Spring%20Boot-4.1.0-6DB33F?logo=springboot&logoColor=white)
+![PostgreSQL 17](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)
+[![Licença MIT](https://img.shields.io/github/license/CarlosRyan07/ryan-qa-labs-assistlar)](LICENSE)
 
 Plataforma fictícia de assistências residenciais desenvolvida para demonstrar práticas de Quality Engineering em uma aplicação autoral, controlada e próxima de um produto real.
 
 > Este projeto é exclusivamente educacional. Não representa nem reproduz sistemas, dados, nomes ou regras de empresas reais.
 
-## O que este portfólio demonstra
+## Resultados em números
+
+- **81 testes automatizados**
+- **51 testes rápidos**
+- **30 testes de integração e API**
+- **97,07% de cobertura de instruções**
+- **95,71% de cobertura de branches**
+- **31 requisições na collection Postman**
+- **18 caminhos documentados no OpenAPI 3.1**
+- **Release atual: v0.1.0**
+
+## Acesso rápido
+
+- [Release v0.1.0](https://github.com/CarlosRyan07/ryan-qa-labs-assistlar/releases/tag/v0.1.0)
+- [Evidências reproduzíveis](docs/evidencias.md)
+- [Estratégia de testes](#estratégia-de-testes) e [catálogo de cenários](docs/cenarios-de-teste.md)
+- [Arquitetura do AssistLar](docs/arquitetura.md)
+- [Guia de execução local](docs/execucao-local.md)
+- [Collection Postman](postman/README.md) — requer a aplicação local em execução para enviar as requisições
+- [Swagger UI](http://localhost:8080/swagger-ui.html) e [contrato OpenAPI](http://localhost:8080/v3/api-docs) — disponíveis somente com a aplicação local em execução
+
+## O que o AssistLar demonstra
 
 - regras de negócio testáveis e estados com transições explícitas;
 - testes unitários, de controller, integração, API, banco e concorrência;
@@ -76,23 +102,7 @@ Módulos: `cliente`, `plano`, `elegibilidade`, `contratacao`, `solicitacao`, `hi
 - Docker com containers Linux;
 - Git.
 
-O build aceita exclusivamente o JDK 21. Confirme `JAVA_HOME`, Maven Wrapper e IDE antes de executar.
-
-Windows PowerShell:
-
-```powershell
-$env:JAVA_HOME = 'C:\Program Files\Java\jdk-21'
-.\mvnw.cmd --version
-```
-
-Linux ou macOS:
-
-```bash
-export JAVA_HOME=/caminho/para/jdk-21
-./mvnw --version
-```
-
-A saída deve informar `Java version: 21`.
+O build aceita exclusivamente o JDK 21. Confirme a versão com `./mvnw --version` ou `.\mvnw.cmd --version` no Windows.
 
 ## Execução
 
@@ -100,7 +110,6 @@ Aplicação e PostgreSQL em containers:
 
 ```bash
 docker compose up --build --wait
-docker compose down
 ```
 
 Somente PostgreSQL no Docker e aplicação pela IDE ou Maven:
@@ -112,17 +121,19 @@ docker compose up -d postgres --wait
 
 No Windows, use `.\mvnw.cmd` no lugar de `./mvnw`.
 
-### Reinício automático durante o desenvolvimento
-
-O Spring Boot DevTools reinicia o contexto da aplicação quando uma alteração compilada chega ao classpath. Ao executar pelo Play da IDE, mantenha o PostgreSQL ligado, salve a alteração e deixe a IDE recompilar o projeto. O console deverá mostrar uma nova inicialização do `AssistLarApplication` sem que seja necessário usar Stop/Play manualmente.
-
-Se salvar o arquivo não provocar o reinício, habilite a compilação automática da IDE. Alterações somente em testes não reiniciam necessariamente a aplicação, e migrations já aplicadas não devem ser editadas.
-
 Com a aplicação iniciada:
 
 - Swagger UI: <http://localhost:8080/swagger-ui.html>
 - OpenAPI: <http://localhost:8080/v3/api-docs> — contrato JSON da API, usado pelo Swagger, por ferramentas e por testes de contrato;
 - Health: <http://localhost:8080/actuator/health> — indicador operacional que informa se a aplicação e suas dependências estão disponíveis.
+
+Para encerrar os containers:
+
+```bash
+docker compose down
+```
+
+Consulte o [guia de execução local](docs/execucao-local.md) para configuração da IDE, reinício automático com DevTools e solução de problemas.
 
 As credenciais do Compose são apenas locais e não devem ser usadas em outro ambiente.
 
