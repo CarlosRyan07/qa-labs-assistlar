@@ -1,11 +1,11 @@
 # Ryan QA Labs — AssistLar
 
-[![CI](https://github.com/CarlosRyan07/ryan-qa-labs-assistlar/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/CarlosRyan07/ryan-qa-labs-assistlar/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/CarlosRyan07/ryan-qa-labs-assistlar?label=release)](https://github.com/CarlosRyan07/ryan-qa-labs-assistlar/releases/latest)
+[![CI](https://github.com/CarlosRyan07/qa-labs-assistlar/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/CarlosRyan07/qa-labs-assistlar/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/CarlosRyan07/qa-labs-assistlar?label=release)](https://github.com/CarlosRyan07/qa-labs-assistlar/releases/latest)
 ![Java 21](https://img.shields.io/badge/Java-21-007396?logo=openjdk&logoColor=white)
 ![Spring Boot 4.1.0](https://img.shields.io/badge/Spring%20Boot-4.1.0-6DB33F?logo=springboot&logoColor=white)
 ![PostgreSQL 17](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)
-[![Licença MIT](https://img.shields.io/github/license/CarlosRyan07/ryan-qa-labs-assistlar)](LICENSE)
+[![Licença MIT](https://img.shields.io/github/license/CarlosRyan07/qa-labs-assistlar)](LICENSE)
 
 Plataforma fictícia de assistências residenciais desenvolvida para demonstrar práticas de Quality Engineering em uma aplicação autoral, controlada e próxima de um produto real.
 
@@ -24,7 +24,7 @@ Plataforma fictícia de assistências residenciais desenvolvida para demonstrar 
 
 ## Acesso rápido
 
-- [Release v0.1.0](https://github.com/CarlosRyan07/ryan-qa-labs-assistlar/releases/tag/v0.1.0)
+- [Release v0.1.0](https://github.com/CarlosRyan07/qa-labs-assistlar/releases/tag/v0.1.0)
 - [Evidências reproduzíveis](docs/evidencias.md)
 - [Estratégia de testes](#estratégia-de-testes) e [catálogo de cenários](docs/cenarios-de-teste.md)
 - [Arquitetura do AssistLar](docs/arquitetura.md)
