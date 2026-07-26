@@ -2,13 +2,21 @@
 
 ## Pré-requisitos
 
-- JDK 21;
+Para executar toda a aplicação com Docker Compose:
+
 - Docker configurado para containers Linux;
 - Git.
 
-O Maven Enforcer exige o JDK 21. Confirme se `JAVA_HOME` e o Maven Wrapper apontam para a versão correta antes de iniciar.
+Para executar a aplicação localmente ou validar o build:
+
+- JDK 21;
+- Maven Wrapper incluído no projeto.
+
+O Maven Enforcer exige exclusivamente o JDK 21. Confirme se `JAVA_HOME` e o Maven Wrapper apontam para a versão correta antes de iniciar.
 
 Windows PowerShell:
+
+Substitua o caminho abaixo pelo diretório em que o JDK 21 está instalado no seu computador.
 
 ```powershell
 $env:JAVA_HOME = 'C:\Program Files\Java\jdk-21'

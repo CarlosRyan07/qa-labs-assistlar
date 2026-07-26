@@ -251,15 +251,30 @@ O contrato OpenAPI 3.1 publica 18 caminhos para clientes, planos, elegibilidade,
 
 A collection Postman possui 31 requisições, com jornadas positivas, cenários negativos, variáveis dinâmicas e scripts de validação.
 
+<details>
+<summary>Ver jornada principal executada no Postman</summary>
+
 ![Jornada principal executada no Postman](docs/assets/postman-jornada-principal.png)
 
+</details>
+
+<details>
+<summary>Ver resposta ProblemDetail validada no Postman</summary>
+
 ![Resposta ProblemDetail validada no Postman](docs/assets/postman-problem-detail.png)
+
+</details>
 
 ### Suíte automatizada
 
 A suíte completa possui 81 testes: 51 rápidos e 30 de integração/API.
 
+<details>
+<summary>Ver execução dos 81 testes automatizados</summary>
+
 ![81 testes aprovados na suíte Maven](docs/assets/testes-81-build-success.png)
+
+</details>
 
 ### Cobertura
 
@@ -271,7 +286,12 @@ O JaCoCo registrou 97,07% de instruções e 95,71% de branches, acima do quality
 
 A aplicação e o PostgreSQL são iniciados pelo Docker Compose com health checks.
 
+<details>
+<summary>Ver Docker Compose saudável</summary>
+
 ![Aplicação e PostgreSQL saudáveis](docs/assets/docker-compose-healthy.png)
+
+</details>
 
 Os comandos, critérios e resultados completos estão nas [evidências reproduzíveis](docs/evidencias.md).
 
@@ -285,14 +305,20 @@ Os comandos, critérios e resultados completos estão nas [evidências reproduz�
 - testes concorrentes usam barreiras e timeout, nunca espera arbitrária;
 - `tipoResponsavel` é definido pelo caso de uso e rejeitado nos payloads.
 
-## Fora do MVP
+## Fora do escopo da v0.1.0
 
-React, autenticação, Playwright, Cypress, Selenium, acessibilidade web, k6, JMeter, notificações, rede de prestadores, geolocalização, agendamento, pagamento, sinistro, corretor, vigência, cloud e microsserviços.
+- autenticação e autorização;
+- interface web e testes de interface;
+- testes de acessibilidade e performance;
+- notificações e integrações externas;
+- rede de prestadores, geolocalização e agendamento;
+- pagamentos, sinistros, corretor e vigência;
+- implantação em cloud e arquitetura de microsserviços.
 
-Evoluções prioritárias: interface React com Playwright, testes de performance com k6 e segurança básica.
+Possíveis evoluções incluem interface web com Playwright, testes de performance com k6 e segurança básica.
 
 ## Repositório e licença
 
-Este projeto integra o portfólio **Ryan QA Labs**.
+O AssistLar é o primeiro projeto público do **Ryan QA Labs**, iniciativa criada para transformar experiência profissional em projetos autorais, reproduzíveis e documentados.
 
-Distribuído sob a licença MIT.
+Distribuído sob a [licença MIT](LICENSE).
