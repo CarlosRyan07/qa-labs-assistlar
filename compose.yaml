@@ -1,4 +1,4 @@
-name: ryan-qa-labs-assistlar
+name: qa-labs-assistlar
 
 services:
   postgres:
