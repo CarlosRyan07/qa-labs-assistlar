@@ -148,9 +148,9 @@ erros possíveis.
 | `/planos` | listar planos e coberturas | viável |
 | `/planos/:id` | detalhe do plano | viável |
 | `/elegibilidade` | informar cliente, selecionar plano e avaliar | parcial; cliente precisa ser conhecido/informado |
-| `/contratacoes` | criar contratação e consultar por UUID | viável; listagem completa indisponível |
+| `/contratacoes/nova` | criar contratação e consultar por UUID | viável; listagem completa indisponível |
 | `/contratacoes/:id` | detalhe, ativação, cancelamento e histórico | viável |
-| `/solicitacoes` | abrir solicitação e consultar por UUID | viável; listagem completa indisponível |
+| `/solicitacoes/nova` | abrir solicitação e consultar por UUID | viável; listagem completa indisponível |
 | `/solicitacoes/:id` | detalhe, transições, cancelamento e histórico | viável |
 
 A navegação para detalhes usará os UUIDs presentes nas URLs. Depois de uma
@@ -407,3 +407,16 @@ evolução deverá ter autorização própria, contrato OpenAPI e testes de back
 - Docker do frontend;
 - qualquer conteúdo de `performance-tests/`;
 - tag, release, merge ou push.
+
+## Estado após o Marco 2
+
+A jornada funcional foi implementada preservando os 18 caminhos existentes da
+API. Clientes, contratações e solicitações oferecem criação e consulta por UUID;
+planos usam a listagem real do backend. As telas de detalhe apresentam somente
+transições válidas para o estado observado e recarregam detalhe e histórico após
+as ações, sem atualização otimista.
+
+As páginas são carregadas sob demanda por rota. A suíte rápida acompanha as
+features com Vitest e Testing Library, enquanto as regras completas continuam
+sob responsabilidade dos testes do backend. Listagens ausentes, autenticação,
+Cypress, Playwright e novos endpoints permanecem fora do Marco 2.

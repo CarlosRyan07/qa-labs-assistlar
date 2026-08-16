@@ -1,5 +1,6 @@
-import { StrictMode } from 'react'
+import { StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Typography } from '@mui/material'
 import { RouterProvider } from 'react-router-dom'
 
 import { AplicacaoProviders } from './app/providers'
@@ -17,7 +18,9 @@ const router = criarRouter()
 createRoot(raiz).render(
   <StrictMode>
     <AplicacaoProviders>
-      <RouterProvider router={router} />
+      <Suspense fallback={<Typography role="status">Carregando página...</Typography>}>
+        <RouterProvider router={router} />
+      </Suspense>
     </AplicacaoProviders>
   </StrictMode>,
 )

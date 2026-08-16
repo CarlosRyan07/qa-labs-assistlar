@@ -58,3 +58,28 @@ A API `v0.1.0` lista apenas planos. A Web será uma jornada guiada: recursos
 criados são acessados pelo UUID retornado, e recursos conhecidos podem ser
 consultados por UUID. O frontend não simula listagens ou métricas ausentes no
 backend.
+
+## Jornada funcional
+
+A navegação acompanha as capacidades reais da API:
+
+| Rota | Operações |
+|---|---|
+| `/clientes` | cadastrar cliente e iniciar consulta por UUID |
+| `/clientes/:id` | consultar, inativar, reativar e seguir para elegibilidade |
+| `/planos` | listar planos ativos e suas coberturas |
+| `/planos/:id` | consultar detalhes e limites de utilização |
+| `/elegibilidade` | avaliar cliente e plano sem persistir resultado |
+| `/contratacoes/nova` | criar contratação pendente ou consultar por UUID |
+| `/contratacoes/:id` | ativar, cancelar e consultar histórico |
+| `/solicitacoes/nova` | abrir solicitação ou consultar por UUID |
+| `/solicitacoes/:id` | iniciar, concluir, cancelar e consultar histórico |
+
+As páginas funcionais são carregadas sob demanda. TanStack Query controla estado
+remoto, loading e atualização após transições; o backend continua sendo a fonte
+de verdade para elegibilidade, cobertura, limites e conflitos.
+
+Os testes rápidos usam Vitest e Testing Library. Eles verificam comportamento
+observável, navegação, formulários, estados, transições, histórico, falhas de
+rede e respostas `ProblemDetail`, sem duplicar a matriz de regras já coberta no
+backend.

@@ -1,6 +1,8 @@
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import type { PropsWithChildren } from 'react'
+import { QueryClientProvider, type QueryClient } from '@tanstack/react-query'
+import { useState, type PropsWithChildren } from 'react'
+
+import { criarClienteConsultas } from './query-client'
 
 const tema = createTheme({
   palette: {
@@ -20,23 +22,17 @@ const tema = createTheme({
   shape: { borderRadius: 12 },
 })
 
-const clienteConsultas = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      refetchOnWindowFocus: false,
-    },
-    mutations: {
-      retry: false,
-    },
-  },
-})
+interface AplicacaoProvidersProps extends PropsWithChildren {
+  clienteConsultas?: QueryClient
+}
 
-export function AplicacaoProviders({ children }: PropsWithChildren) {
+export function AplicacaoProviders({ children, clienteConsultas }: AplicacaoProvidersProps) {
+  const [clientePadrao] = useState(criarClienteConsultas)
+
   return (
     <ThemeProvider theme={tema}>
       <CssBaseline />
-      <QueryClientProvider client={clienteConsultas}>{children}</QueryClientProvider>
+      <QueryClientProvider client={clienteConsultas ?? clientePadrao}>{children}</QueryClientProvider>
     </ThemeProvider>
   )
 }
