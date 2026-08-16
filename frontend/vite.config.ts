@@ -20,8 +20,24 @@ export default defineConfig(({ mode }) => {
       environment: 'jsdom',
       setupFiles: './src/test/setup.ts',
       css: true,
-      pool: 'threads',
+      pool: 'forks',
+      maxWorkers: 1,
+      fileParallelism: false,
       testTimeout: 10_000,
+      coverage: {
+        provider: 'v8',
+        reporter: ['text', 'json-summary', 'html'],
+        reportsDirectory: 'coverage',
+        all: true,
+        include: ['src/**/*.{ts,tsx}'],
+        exclude: ['src/main.tsx', 'src/vite-env.d.ts'],
+        thresholds: {
+          statements: 80,
+          branches: 70,
+          functions: 80,
+          lines: 80,
+        },
+      },
     },
   }
 })

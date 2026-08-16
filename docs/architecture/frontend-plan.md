@@ -420,3 +420,22 @@ As páginas são carregadas sob demanda por rota. A suíte rápida acompanha as
 features com Vitest e Testing Library, enquanto as regras completas continuam
 sob responsabilidade dos testes do backend. Listagens ausentes, autenticação,
 Cypress, Playwright e novos endpoints permanecem fora do Marco 2.
+
+## Estado após o Marco 3
+
+A suíte Vitest e Testing Library foi consolidada com testes de componentes,
+formulários, transições, fronteiras HTTP e estados seguros de erro. A medição
+com o provedor V8 registrou 89,83% de statements, 86,88% de branches, 85,25% de
+functions e 91,06% de lines, em 59 testes distribuídos por 18 arquivos.
+
+Com essa linha de base observada, o quality gate local passou a exigir 80% de
+statements, 70% de branches, 80% de functions e 80% de lines. Ele considera o
+código fonte e exclui apenas o bootstrap estrutural `main.tsx` e a declaração
+gerada `vite-env.d.ts`. Os números serão reavaliados quando Cypress Component
+Testing e Playwright adicionarem camadas diferentes de evidência; métricas Java
+e TypeScript continuarão separadas.
+
+No ambiente Windows do projeto, o Vitest usa `forks`, um worker e execução
+serial. A configuração foi escolhida depois de confirmar que o pool de threads
+executava os cenários, mas não encerrava o processo de modo confiável. É um
+trade-off explícito de duração por repetibilidade e poderá ser reavaliado na CI.

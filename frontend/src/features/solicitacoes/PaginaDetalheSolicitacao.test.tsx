@@ -7,6 +7,7 @@ import {
   cancelarSolicitacao,
   consultarHistoricoSolicitacao,
   consultarSolicitacao,
+  concluirSolicitacao,
   iniciarSolicitacao,
 } from './api/solicitacoes-api'
 import { PaginaDetalheSolicitacao } from './PaginaDetalheSolicitacao'
@@ -122,6 +123,47 @@ describe('PaginaDetalheSolicitacao', () => {
       expect.anything(),
       expect.objectContaining({ tipoResponsavel: expect.anything() }),
     )
+  })
+
+  it('conclui o atendimento e mostra o estado devolvido pela API', async () => {
+    const emAtendimento: Solicitacao = {
+      ...solicitacaoAberta,
+      status: 'EM_ATENDIMENTO',
+      iniciadaEm: '2026-08-16T12:10:00Z',
+      versao: 1,
+    }
+    vi.mocked(consultarSolicitacao).mockResolvedValue(emAtendimento)
+    vi.mocked(consultarHistoricoSolicitacao).mockResolvedValue([])
+    vi.mocked(concluirSolicitacao).mockResolvedValue({
+      ...emAtendimento,
+      status: 'CONCLUIDA',
+      concluidaEm: '2026-08-16T12:20:00Z',
+      versao: 2,
+    })
+    renderizarPagina()
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Concluir atendimento' }))
+
+    await waitFor(() => expect(concluirSolicitacao).toHaveBeenCalledWith(solicitacaoId))
+    expect(await screen.findByLabelText('Status: Concluída')).toBeVisible()
+    expect(screen.queryByRole('form', { name: 'Cancelar solicitação' })).not.toBeInTheDocument()
+  })
+
+  it('cancela uma solicitacao aberta sem motivo', async () => {
+    vi.mocked(consultarSolicitacao).mockResolvedValue(solicitacaoAberta)
+    vi.mocked(consultarHistoricoSolicitacao).mockResolvedValue([])
+    vi.mocked(cancelarSolicitacao).mockResolvedValue({
+      ...solicitacaoAberta,
+      status: 'CANCELADA',
+      canceladaEm: '2026-08-16T12:20:00Z',
+      versao: 1,
+    })
+    renderizarPagina()
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Cancelar solicitação' }))
+
+    await waitFor(() => expect(cancelarSolicitacao).toHaveBeenCalledWith(solicitacaoId, undefined))
+    expect(await screen.findByLabelText('Status: Cancelada')).toBeVisible()
   })
 
   it('apresenta o historico com estado, responsavel e motivo retornados pela API', async () => {

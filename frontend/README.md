@@ -45,6 +45,7 @@ npm run dev
 npm run lint
 npm run typecheck
 npm run test
+npm run test:coverage
 npm run build
 ```
 
@@ -83,3 +84,18 @@ Os testes rápidos usam Vitest e Testing Library. Eles verificam comportamento
 observável, navegação, formulários, estados, transições, histórico, falhas de
 rede e respostas `ProblemDetail`, sem duplicar a matriz de regras já coberta no
 backend.
+
+`npm run test:coverage` gera as métricas de statements, branches, functions e
+lines em `coverage/`. O relatório HTML pode ser aberto por
+`coverage/index.html`; ele é um artefato local e não é versionado. A medição
+considera o código de `src/`; ficam fora apenas o bootstrap estrutural
+(`src/main.tsx`) e a declaração gerada pelo Vite (`src/vite-env.d.ts`).
+
+O quality gate inicial exige ao menos 80% de statements, 70% de branches, 80%
+de functions e 80% de lines. Os limites foram definidos após a primeira medição
+real do Marco 3, não para mascarar lacunas de teste.
+
+No Windows, a suíte usa um processo isolado e execução serial para evitar que o
+pool de threads do Vitest permaneça aberto após os testes. A prioridade atual é
+um resultado determinístico; o paralelismo será reavaliado quando houver uma
+evidência de estabilidade no ambiente de CI.

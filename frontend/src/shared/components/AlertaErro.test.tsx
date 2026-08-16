@@ -31,4 +31,14 @@ describe('AlertaErro', () => {
     expect(screen.getByRole('alert')).not.toHaveTextContent('SQL exception')
     expect(screen.getByRole('alert')).toHaveTextContent('Tente novamente')
   })
+
+  it.each([
+    ['rede', undefined, 'Verifique se o backend está disponível.'],
+    ['http', 409, 'Os dados foram alterados ou existe um conflito.'],
+    ['http', 422, 'A operação foi recusada por uma regra de negócio.'],
+  ] as const)('traduz o erro %s com status %s para uma mensagem segura', (tipo, status, mensagem) => {
+    render(<AlertaErro erro={new ErroHttp({ tipo, status })} />)
+
+    expect(screen.getByRole('alert')).toHaveTextContent(mensagem)
+  })
 })
