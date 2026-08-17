@@ -14,6 +14,7 @@ contrato existente do backend.
 - React Router `7.18.2`;
 - TanStack Query `5.101.4`;
 - Vitest `4.1.10` e Testing Library.
+- Cypress `15.20.1` para Component Testing.
 
 Confirme o ambiente:
 
@@ -46,6 +47,7 @@ npm run lint
 npm run typecheck
 npm run test
 npm run test:coverage
+npm run test:component
 npm run build
 ```
 
@@ -89,7 +91,8 @@ backend.
 lines em `coverage/`. O relatório HTML pode ser aberto por
 `coverage/index.html`; ele é um artefato local e não é versionado. A medição
 considera o código de `src/`; ficam fora apenas o bootstrap estrutural
-(`src/main.tsx`) e a declaração gerada pelo Vite (`src/vite-env.d.ts`).
+(`src/main.tsx`), a declaração gerada pelo Vite (`src/vite-env.d.ts`) e os
+arquivos de teste Cypress (`*.cy.tsx`), que pertencem a outra suíte.
 
 O quality gate inicial exige ao menos 80% de statements, 70% de branches, 80%
 de functions e 80% de lines. Os limites foram definidos após a primeira medição
@@ -99,3 +102,17 @@ No Windows, a suíte usa um processo isolado e execução serial para evitar que
 pool de threads do Vitest permaneça aberto após os testes. A prioridade atual é
 um resultado determinístico; o paralelismo será reavaliado quando houver uma
 evidência de estabilidade no ambiente de CI.
+
+## Component Testing
+
+O Cypress executa poucos componentes de maior risco em Electron real. Nesta
+fase, ele confirma o atalho focalizável do shell e o cancelamento de uma
+solicitação em atendimento, incluindo a mensagem obrigatória e o payload sem
+`tipoResponsavel`. A matriz completa de regras permanece nos testes do backend,
+e as jornadas integradas permanecerão sob responsabilidade do Playwright no
+Marco 5.
+
+Use `npm run test:component` para execução headless ou
+`npm run test:component:open` para abrir o Cypress interativamente. O wrapper
+local remove `ELECTRON_RUN_AS_NODE` apenas do processo do Cypress, pois essa
+variável impede a inicialização do Electron quando herdada pelo terminal.

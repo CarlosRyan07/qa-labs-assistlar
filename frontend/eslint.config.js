@@ -25,4 +25,16 @@ export default tseslint.config(
       ...reactRefresh.configs.vite.rules,
     },
   },
+  {
+    files: ['cypress/**/*.{ts,tsx}', 'src/**/*.cy.{ts,tsx}'],
+    languageOptions: {
+      globals: {
+        cy: 'readonly',
+        Cypress: 'readonly',
+        describe: 'readonly',
+        expect: 'readonly',
+        it: 'readonly',
+      },
+    },
+  },
 )

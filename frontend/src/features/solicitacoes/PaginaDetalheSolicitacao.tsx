@@ -188,6 +188,7 @@ export function PaginaDetalheSolicitacao() {
               <Stack
                 component="form"
                 spacing={2}
+                noValidate
                 onSubmit={cancelar}
                 aria-labelledby="cancelamento-solicitacao-titulo"
               >

@@ -431,7 +431,8 @@ functions e 91,06% de lines, em 59 testes distribuídos por 18 arquivos.
 Com essa linha de base observada, o quality gate local passou a exigir 80% de
 statements, 70% de branches, 80% de functions e 80% de lines. Ele considera o
 código fonte e exclui apenas o bootstrap estrutural `main.tsx` e a declaração
-gerada `vite-env.d.ts`. Os números serão reavaliados quando Cypress Component
+gerada `vite-env.d.ts`, além dos specs Cypress `*.cy.tsx` que não são
+executados pelo Vitest. Os números serão reavaliados quando Cypress Component
 Testing e Playwright adicionarem camadas diferentes de evidência; métricas Java
 e TypeScript continuarão separadas.
 
@@ -439,3 +440,20 @@ No ambiente Windows do projeto, o Vitest usa `forks`, um worker e execução
 serial. A configuração foi escolhida depois de confirmar que o pool de threads
 executava os cenários, mas não encerrava o processo de modo confiável. É um
 trade-off explícito de duração por repetibilidade e poderá ser reavaliado na CI.
+
+## Estado após o Marco 4
+
+O Cypress Component Testing foi configurado com React e Vite, executando em
+Electron. A suíte contém três cenários: foco observável do atalho para o
+conteúdo principal e duas verificações de cancelamento em atendimento
+(mensagem obrigatória e payload sem `tipoResponsavel`).
+
+O Component Testing não reproduz a jornada E2E nem as regras completas já
+cobertas pelo backend. Ele é a camada complementar para eventos, foco, campos
+Material UI e requisições interceptadas no navegador. O Playwright continua
+reservado para a jornada Full Stack do Marco 5.
+
+Durante a configuração foi identificado que `ELECTRON_RUN_AS_NODE` impede o
+Electron de iniciar quando a variável é herdada pelo processo. O script local
+do Cypress a remove somente para sua execução; nenhuma variável é exposta ao
+código da aplicação.

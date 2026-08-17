@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
         reportsDirectory: 'coverage',
         all: true,
         include: ['src/**/*.{ts,tsx}'],
-        exclude: ['src/main.tsx', 'src/vite-env.d.ts'],
+        exclude: ['src/**/*.cy.{ts,tsx}', 'src/main.tsx', 'src/vite-env.d.ts'],
         thresholds: {
           statements: 80,
           branches: 70,
