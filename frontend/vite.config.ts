@@ -1,6 +1,6 @@
 import react from '@vitejs/plugin-react'
 import { loadEnv } from 'vite'
-import { defineConfig } from 'vitest/config'
+import { configDefaults, defineConfig } from 'vitest/config'
 
 export default defineConfig(({ mode }) => {
   const ambiente = loadEnv(mode, process.cwd(), '')
@@ -24,13 +24,20 @@ export default defineConfig(({ mode }) => {
       maxWorkers: 1,
       fileParallelism: false,
       testTimeout: 10_000,
+      exclude: [...configDefaults.exclude, 'e2e/**'],
       coverage: {
         provider: 'v8',
         reporter: ['text', 'json-summary', 'html'],
         reportsDirectory: 'coverage',
         all: true,
         include: ['src/**/*.{ts,tsx}'],
-        exclude: ['src/**/*.cy.{ts,tsx}', 'src/main.tsx', 'src/vite-env.d.ts'],
+        exclude: [
+          'src/**/*.cy.{ts,tsx}',
+          'src/main.tsx',
+          'src/vite-env.d.ts',
+          'e2e/**',
+          'playwright.config.ts'
+        ],
         thresholds: {
           statements: 80,
           branches: 70,

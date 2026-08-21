@@ -17,6 +17,8 @@
     "test:coverage": "vitest run --coverage",
     "test:component": "node ./scripts/executar-cypress.mjs run --component --browser electron",
     "test:component:open": "node ./scripts/executar-cypress.mjs open --component",
+    "test:e2e": "node ./scripts/executar-e2e.mjs --project=chromium",
+    "test:e2e:full": "node ./scripts/executar-e2e.mjs --project=chromium --project=firefox --project=webkit --project=mobile-chromium",
     "test:watch": "vitest",
     "preview": "vite preview"
   },
@@ -31,6 +33,7 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@playwright/test": "1.62.1",
     "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.2",

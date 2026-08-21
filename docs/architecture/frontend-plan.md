@@ -346,9 +346,15 @@ criado endpoint de limpeza exclusivo para testes na API pública.
 
 ### Marco 5 — Playwright
 
-- jornada crítica, cenários negativos selecionados, cross-browser e mobile;
-- traces, screenshots em falha e relatório HTML;
-- regressão visual somente em telas estáveis.
+- jornada crítica, cenário negativo de cancelamento em atendimento,
+  cross-browser e mobile;
+- Compose E2E isolado, com banco efêmero, dados sintéticos únicos e limpeza
+  obrigatória dos containers e volumes ao final;
+- Chromium no comando rápido; Firefox, WebKit e perfil mobile Chromium no
+  comando completo;
+- traces, screenshots e vídeos apenas em falha, com relatório HTML ignorado
+  pelo Git;
+- regressão visual permanece adiada para telas que tenham se estabilizado.
 
 ### Consolidação
 
@@ -457,3 +463,23 @@ Durante a configuração foi identificado que `ELECTRON_RUN_AS_NODE` impede o
 Electron de iniciar quando a variável é herdada pelo processo. O script local
 do Cypress a remove somente para sua execução; nenhuma variável é exposta ao
 código da aplicação.
+
+## Estado após o Marco 5
+
+O Playwright foi configurado como a suíte E2E principal. A jornada dourada
+cadastro de cliente → elegibilidade → contratação → ativação → solicitação →
+início → conclusão é executada pelo navegador contra o backend e PostgreSQL
+reais. Um cenário negativo complementar confirma que o cancelamento em
+atendimento exige motivo e atualiza o histórico após a confirmação da API.
+
+O comando rápido usa Chromium. A matriz completa também valida Firefox, WebKit
+e o perfil mobile Chromium. Cada execução sobe um Compose específico do E2E na
+porta local `18080`, com volume de banco efêmero e dados sintéticos únicos; o
+script remove containers, rede e volume mesmo se um teste falhar. Traces,
+screenshots, vídeos e relatório HTML são preservados somente como artefatos
+locais em caso de falha e permanecem ignorados pelo Git.
+
+O Vitest exclui `e2e/**` da descoberta de testes para não coletar specs do
+Playwright. Essa separação mantém o quality gate baseado exclusivamente no
+código fonte e nos testes unitários/componentes, sem reduzir os limites já
+estabelecidos.

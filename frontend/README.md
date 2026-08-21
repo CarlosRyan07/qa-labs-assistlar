@@ -15,6 +15,7 @@ contrato existente do backend.
 - TanStack Query `5.101.4`;
 - Vitest `4.1.10` e Testing Library.
 - Cypress `15.20.1` para Component Testing.
+- Playwright `1.62.1` para jornadas E2E Full Stack.
 
 Confirme o ambiente:
 
@@ -48,6 +49,8 @@ npm run typecheck
 npm run test
 npm run test:coverage
 npm run test:component
+npm run test:e2e
+npm run test:e2e:full
 npm run build
 ```
 
@@ -116,3 +119,22 @@ Use `npm run test:component` para execução headless ou
 `npm run test:component:open` para abrir o Cypress interativamente. O wrapper
 local remove `ELECTRON_RUN_AS_NODE` apenas do processo do Cypress, pois essa
 variável impede a inicialização do Electron quando herdada pelo terminal.
+
+## Testes E2E
+
+O Playwright é a camada E2E principal. `npm run test:e2e` sobe uma instância
+isolada do Compose, com PostgreSQL descartável e backend exposto apenas em
+`http://127.0.0.1:18080`; depois inicia o Vite com proxy local e executa a
+jornada crítica no Chromium. Ao final, inclusive quando há falha, o script
+remove os containers e o volume desse projeto isolado.
+
+`npm run test:e2e:full` executa a mesma suíte em Chromium, Firefox, WebKit e no
+perfil mobile Chromium. Antes da primeira execução completa, baixe os
+navegadores com `npx playwright install`.
+
+Cada cenário usa e-mails sintéticos e únicos. A jornada principal é conduzida
+inteiramente pela interface; apenas a precondição do cenário negativo é criada
+pela API, para concentrar a evidência da UI no cancelamento em atendimento. Em
+falhas, Playwright preserva trace, screenshot e vídeo em `test-results/` e gera
+o relatório HTML em `playwright-report/`; ambos são artefatos locais ignorados
+pelo Git.
