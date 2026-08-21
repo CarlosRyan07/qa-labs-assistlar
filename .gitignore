@@ -15,6 +15,7 @@ frontend/.env*
 *.log
 .env
 reports/
+performance-tests/results/
 allure-results/
 allure-report/
 docker-data/
