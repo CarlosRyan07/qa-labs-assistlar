@@ -19,6 +19,7 @@ Todas as alterações relevantes deste projeto serão documentadas neste arquivo
 - 3 testes Cypress Component aprovados;
 - 8 execuções Playwright aprovadas na matriz completa;
 - 89,83% de statements e 86,88% de branches no frontend.
+- cenário inicial de carga leve com k6 para health e consulta de planos.
 
 ## [0.1.0] - 2026-07-23
 

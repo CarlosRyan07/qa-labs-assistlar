@@ -327,8 +327,10 @@ Os comandos, critérios e resultados completos estão nas [evidências reproduz�
 - pagamentos, sinistros, corretor e vigência;
 - implantação em cloud e arquitetura de microsserviços.
 
-Próximas evoluções incluem testes de performance com k6, automação especializada
-de acessibilidade e segurança básica.
+Próximas evoluções incluem automação especializada de acessibilidade e
+segurança básica. Os cenários de carga com k6 ficam documentados em
+[`performance-tests/`](performance-tests/), com perfil leve e execução manual
+controlada.
 
 ## Repositório e licença
 

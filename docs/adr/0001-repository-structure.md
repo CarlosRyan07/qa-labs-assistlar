@@ -69,8 +69,9 @@ qa-labs-assistlar/
 └── .github/workflows/
 ```
 
-O futuro diretório `performance-tests/` não será criado durante a `v0.2.0`. Ele
-só aparecerá quando o trabalho real da `v0.3.0` começar.
+O diretório `performance-tests/` não fazia parte da `v0.2.0`. Ele foi criado
+somente quando o trabalho real de performance da `v0.3.0` começou, em uma
+branch própria e com escopo de carga leve controlada.
 
 Dentro do frontend, a organização será orientada a features. Estrutura técnica
 usa inglês e o domínio AssistLar usa português. `shared` não poderá depender de
