@@ -20,12 +20,31 @@ export function App() {
         Pular para o conteúdo
       </Button>
 
-      <AppBar position="static" component="header" elevation={0}>
-        <Toolbar sx={{ gap: 2, flexWrap: 'wrap' }}>
+      <AppBar
+        position="static"
+        component="header"
+        elevation={0}
+        sx={{
+          background: 'linear-gradient(115deg, #0a2840 0%, #123b5d 58%, #1d5879 100%)',
+          borderBottom: '1px solid rgba(255,255,255,0.13)',
+        }}
+      >
+        <Toolbar sx={{ gap: 2, minHeight: { xs: 72, md: 84 }, flexWrap: 'wrap', py: 1.25 }}>
           <Typography component="span" variant="h6" sx={{ fontWeight: 700 }}>
             Ryan QA Labs — AssistLar
           </Typography>
-          <Box component="nav" aria-label="Navegação principal" sx={{ ml: { md: 'auto' } }}>
+          <Box
+            component="nav"
+            aria-label="Navegação principal"
+            sx={{
+              ml: { md: 'auto' },
+              display: 'flex',
+              gap: 0.5,
+              width: { xs: '100%', md: 'auto' },
+              overflowX: 'auto',
+              '& a': { whiteSpace: 'nowrap' },
+            }}
+          >
             <Button component={Link} to="/" color="inherit">
               Início
             </Button>
@@ -57,6 +76,14 @@ export function App() {
       >
         <Outlet />
       </Container>
+
+      <Box component="footer" sx={{ borderTop: '1px solid', borderColor: 'divider', py: 3 }}>
+        <Container maxWidth="lg">
+          <Typography variant="body2" color="text.secondary">
+            Ryan QA Labs — AssistLar · Plataforma autoral para demonstrar Quality Engineering.
+          </Typography>
+        </Container>
+      </Box>
     </Box>
   )
 }
