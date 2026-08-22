@@ -11,13 +11,13 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import { AlertaErro } from '../../shared/components/AlertaErro'
 import { ehUuid } from '../../shared/utils/uuid'
-import { abrirSolicitacao } from './api/solicitacoes-api'
+import { abrirSolicitacao, listarSolicitacoes } from './api/solicitacoes-api'
 import type { TipoAssistencia } from './tipos'
 
 interface FormularioSolicitacao {
@@ -36,6 +36,12 @@ export function PaginaSolicitacoes() {
   })
   const [idConsulta, setIdConsulta] = useState('')
   const [erroConsulta, setErroConsulta] = useState<string>()
+  const [contratacaoBusca, setContratacaoBusca] = useState(parametros.get('contratacaoId') ?? '')
+  const lista = useQuery({
+    queryKey: ['solicitacoes', contratacaoBusca],
+    queryFn: () => listarSolicitacoes(contratacaoBusca),
+    enabled: ehUuid(contratacaoBusca),
+  })
   const abertura = useMutation({
     mutationFn: abrirSolicitacao,
     retry: false,
@@ -81,6 +87,29 @@ export function PaginaSolicitacoes() {
           Abra uma solicitação para uma contratação ativa ou consulte uma solicitação pelo UUID.
         </Typography>
       </Box>
+
+      <Card component="section" aria-labelledby="lista-solicitacoes-titulo" variant="outlined">
+        <CardContent>
+          <Stack spacing={2}>
+            <Box>
+              <Typography id="lista-solicitacoes-titulo" component="h2" variant="h5" gutterBottom>
+                Solicitacoes da contratacao
+              </Typography>
+              <Typography color="text.secondary">Informe um UUID para consultar os atendimentos relacionados.</Typography>
+            </Box>
+            <TextField label="UUID da contratacao para listar" value={contratacaoBusca} onChange={(evento) => setContratacaoBusca(evento.target.value)} />
+            {!ehUuid(contratacaoBusca) && <Typography color="text.secondary">A consulta sera habilitada quando o UUID for valido.</Typography>}
+            {lista.isLoading && <Typography color="text.secondary">Carregando solicitacoes...</Typography>}
+            {lista.isError && <AlertaErro erro={lista.error} titulo="Nao foi possivel carregar as solicitacoes" />}
+            {!lista.isLoading && !lista.isError && lista.data?.itens.length === 0 && <Typography color="text.secondary">Nenhuma solicitacao encontrada.</Typography>}
+            {lista.data?.itens.map((solicitacao) => (
+              <Button key={solicitacao.id} onClick={() => navegar(`/solicitacoes/${solicitacao.id}`)} sx={{ justifyContent: 'flex-start' }} variant="outlined">
+                {solicitacao.tipoAssistencia} — {solicitacao.status}
+              </Button>
+            ))}
+          </Stack>
+        </CardContent>
+      </Card>
 
       <Box
         sx={{

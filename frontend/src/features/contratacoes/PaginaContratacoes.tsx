@@ -1,11 +1,11 @@
 import { Alert, Box, Button, Card, CardContent, Stack, TextField, Typography } from '@mui/material'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import { AlertaErro } from '../../shared/components/AlertaErro'
 import { ehUuid } from '../../shared/utils/uuid'
-import { criarContratacao } from './api'
+import { criarContratacao, listarContratacoes } from './api'
 
 interface DadosCriacao {
   clienteId: string
@@ -22,6 +22,12 @@ export function PaginaContratacoes() {
   const [idConsulta, setIdConsulta] = useState('')
   const [erroCriacao, setErroCriacao] = useState<string>()
   const [erroConsulta, setErroConsulta] = useState<string>()
+  const [clienteBusca, setClienteBusca] = useState(parametros.get('clienteId') ?? '')
+  const lista = useQuery({
+    queryKey: ['contratacoes', clienteBusca],
+    queryFn: () => listarContratacoes(clienteBusca),
+    enabled: ehUuid(clienteBusca),
+  })
   const criacao = useMutation({
     mutationFn: criarContratacao,
     retry: false,
@@ -67,6 +73,29 @@ export function PaginaContratacoes() {
           Crie uma contratação pendente ou consulte uma contratação existente pelo UUID.
         </Typography>
       </Box>
+
+      <Card component="section" aria-labelledby="lista-contratacoes-titulo" variant="outlined">
+        <CardContent>
+          <Stack spacing={2}>
+            <Box>
+              <Typography id="lista-contratacoes-titulo" component="h2" variant="h5" gutterBottom>
+                Contratacoes do cliente
+              </Typography>
+              <Typography color="text.secondary">Informe um UUID para consultar as contratacoes relacionadas.</Typography>
+            </Box>
+            <TextField label="UUID do cliente para listar" value={clienteBusca} onChange={(evento) => setClienteBusca(evento.target.value)} />
+            {!ehUuid(clienteBusca) && <Typography color="text.secondary">A consulta sera habilitada quando o UUID for valido.</Typography>}
+            {lista.isLoading && <Typography color="text.secondary">Carregando contratacoes...</Typography>}
+            {lista.isError && <AlertaErro erro={lista.error} titulo="Nao foi possivel carregar as contratacoes" />}
+            {!lista.isLoading && !lista.isError && lista.data?.itens.length === 0 && <Typography color="text.secondary">Nenhuma contratacao encontrada.</Typography>}
+            {lista.data?.itens.map((contratacao) => (
+              <Button key={contratacao.id} onClick={() => navegar(`/contratacoes/${contratacao.id}`)} sx={{ justifyContent: 'flex-start' }} variant="outlined">
+                {contratacao.status} — {contratacao.id}
+              </Button>
+            ))}
+          </Stack>
+        </CardContent>
+      </Card>
 
       <Box
         sx={{
