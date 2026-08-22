@@ -96,6 +96,18 @@ Módulos: `cliente`, `plano`, `elegibilidade`, `contratacao`, `solicitacao`, `hi
 - GitHub Actions;
 - Docker e Docker Compose.
 
+### Evolução Web v0.2.0
+
+A aplicação Web fica em [`frontend/`](frontend/README.md) e preserva o contrato
+existente do backend como fonte da verdade. Ela usa React, TypeScript, Vite,
+Material UI, React Router e TanStack Query, com Vitest e Testing Library para
+feedback rápido, Cypress Component Testing e Playwright para jornadas E2E Full
+Stack.
+
+Os comandos e critérios estão documentados no [guia do frontend](frontend/README.md).
+O Playwright executa uma jornada dourada e um cenário negativo contra Spring
+Boot e PostgreSQL reais em um Compose efêmero, removido ao final da execução.
+
 ## Pré-requisitos
 
 - JDK 21;
@@ -315,7 +327,8 @@ Os comandos, critérios e resultados completos estão nas [evidências reproduz�
 - pagamentos, sinistros, corretor e vigência;
 - implantação em cloud e arquitetura de microsserviços.
 
-Possíveis evoluções incluem interface web com Playwright, testes de performance com k6 e segurança básica.
+Próximas evoluções incluem testes de performance com k6, automação especializada
+de acessibilidade e segurança básica.
 
 ## Repositório e licença
 

@@ -2,6 +2,24 @@
 
 Todas as alterações relevantes deste projeto serão documentadas neste arquivo.
 
+## [Unreleased]
+
+### Adicionado
+
+- aplicação Web v0.2.0 em jornada guiada, sem inventar endpoints ausentes no backend;
+- testes rápidos com Vitest e Testing Library;
+- Cypress Component Testing para componentes de maior risco;
+- Playwright E2E com jornada dourada, cenário negativo, cross-browser e perfil mobile;
+- ambientes E2E efêmeros com Compose e PostgreSQL descartável;
+- jobs de qualidade frontend e E2E no GitHub Actions, com artefatos de cobertura e evidências.
+
+### Qualidade
+
+- 59 testes Vitest aprovados;
+- 3 testes Cypress Component aprovados;
+- 8 execuções Playwright aprovadas na matriz completa;
+- 89,83% de statements e 86,88% de branches no frontend.
+
 ## [0.1.0] - 2026-07-23
 
 ### Adicionado
