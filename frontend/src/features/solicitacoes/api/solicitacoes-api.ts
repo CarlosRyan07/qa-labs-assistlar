@@ -2,7 +2,19 @@ import { requisitarJson } from '../../../shared/api/http'
 
 import type { HistoricoSolicitacao, Solicitacao, SolicitacaoCriacao } from '../tipos'
 
+export interface PaginaSolicitacoes {
+  itens: Solicitacao[]
+  pagina: number
+  tamanho: number
+  totalItens: number
+  totalPaginas: number
+}
+
 const recursoSolicitacoes = '/solicitacoes-assistencia'
+
+export function listarSolicitacoes(contratacaoId: string): Promise<PaginaSolicitacoes> {
+  return requisitarJson<PaginaSolicitacoes>(`${recursoSolicitacoes}?contratacaoId=${encodeURIComponent(contratacaoId)}`)
+}
 
 export function abrirSolicitacao(criacao: SolicitacaoCriacao): Promise<Solicitacao> {
   return requisitarJson<Solicitacao>(recursoSolicitacoes, {

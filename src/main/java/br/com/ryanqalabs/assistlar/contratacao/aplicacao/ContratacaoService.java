@@ -4,6 +4,9 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -15,6 +18,8 @@ import br.com.ryanqalabs.assistlar.cliente.infraestrutura.ClienteRepository;
 import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoConflito;
 import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoRegraNegocio;
 import br.com.ryanqalabs.assistlar.compartilhado.erro.RecursoNaoEncontradoException;
+import br.com.ryanqalabs.assistlar.compartilhado.api.PaginaResposta;
+import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoDadosInvalidos;
 import br.com.ryanqalabs.assistlar.contratacao.api.ContratacaoCancelamentoRequisicao;
 import br.com.ryanqalabs.assistlar.contratacao.api.ContratacaoCriacaoRequisicao;
 import br.com.ryanqalabs.assistlar.contratacao.api.ContratacaoResposta;
@@ -84,6 +89,15 @@ public class ContratacaoService {
         return ContratacaoResposta.de(buscarEntidade(id));
     }
 
+    @Transactional(readOnly = true)
+    public PaginaResposta<ContratacaoResposta> listarPorCliente(UUID clienteId, int pagina, int tamanho) {
+        validarPaginacao(pagina, tamanho);
+        Page<Contratacao> contratacoes = repository.findByClienteId(clienteId,
+                PageRequest.of(pagina, tamanho, Sort.by(Sort.Direction.DESC, "criadaEm")));
+        return new PaginaResposta<>(contratacoes.map(ContratacaoResposta::de).getContent(), contratacoes.getNumber(),
+                contratacoes.getSize(), contratacoes.getTotalElements(), contratacoes.getTotalPages());
+    }
+
     @Transactional
     public ContratacaoResposta ativar(UUID id) {
         Contratacao contratacao = buscarEntidade(id);
@@ -133,5 +147,11 @@ public class ContratacaoService {
     private Contratacao buscarEntidade(UUID id) {
         return repository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException(
                 "contratacao-nao-encontrada", "Contratacao nao encontrada."));
+    }
+
+    private void validarPaginacao(int pagina, int tamanho) {
+        if (pagina < 0 || tamanho < 1 || tamanho > 100) {
+            throw new ExcecaoDadosInvalidos("paginacao-invalida", "Pagina deve ser maior ou igual a zero e tamanho deve estar entre 1 e 100.");
+        }
     }
 }

@@ -15,6 +15,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.com.ryanqalabs.assistlar.contratacao.aplicacao.ContratacaoService;
 import br.com.ryanqalabs.assistlar.historico.api.HistoricoStatusResposta;
+import br.com.ryanqalabs.assistlar.compartilhado.api.PaginaResposta;
+import org.springframework.web.bind.annotation.RequestParam;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -37,6 +39,14 @@ public class ContratacaoController {
         URI localizacao = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(resposta.id()).toUri();
         return ResponseEntity.created(localizacao).body(resposta);
+    }
+
+    @GetMapping
+    @Operation(summary = "Lista contratacoes de um cliente")
+    public ResponseEntity<PaginaResposta<ContratacaoResposta>> listarPorCliente(
+            @RequestParam UUID clienteId, @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "20") int tamanho) {
+        return ResponseEntity.ok(service.listarPorCliente(clienteId, pagina, tamanho));
     }
 
     @GetMapping("/{id}")
