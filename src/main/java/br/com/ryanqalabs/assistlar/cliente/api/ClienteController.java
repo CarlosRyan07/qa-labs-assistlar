@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.com.ryanqalabs.assistlar.cliente.aplicacao.ClienteService;
+import br.com.ryanqalabs.assistlar.compartilhado.api.PaginaResposta;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -56,6 +58,15 @@ public class ClienteController {
                 .buildAndExpand(resposta.id())
                 .toUri();
         return ResponseEntity.created(localizacao).body(resposta);
+    }
+
+    @GetMapping
+    @Operation(summary = "Lista clientes com paginacao", description = "Permite busca simples por nome ou e-mail.")
+    public ResponseEntity<PaginaResposta<ClienteResposta>> listar(
+            @RequestParam(defaultValue = "") String busca,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "20") int tamanho) {
+        return ResponseEntity.ok(service.listar(busca, pagina, tamanho));
     }
 
     @GetMapping("/{id}")

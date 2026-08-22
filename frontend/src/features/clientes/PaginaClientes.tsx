@@ -1,11 +1,11 @@
 import { Alert, Box, Button, Card, CardContent, Stack, TextField, Typography } from '@mui/material'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { AlertaErro } from '../../shared/components/AlertaErro'
 import { ehUuid } from '../../shared/utils/uuid'
-import { cadastrarCliente } from './api/clientes-api'
+import { cadastrarCliente, listarClientes } from './api/clientes-api'
 
 interface CadastroForm {
   nome: string
@@ -24,6 +24,8 @@ export function PaginaClientes() {
   const [cadastro, setCadastro] = useState<CadastroForm>(cadastroInicial)
   const [idConsulta, setIdConsulta] = useState('')
   const [erroConsulta, setErroConsulta] = useState<string>()
+  const [busca, setBusca] = useState('')
+  const clientes = useQuery({ queryKey: ['clientes', busca], queryFn: () => listarClientes(busca) })
   const cadastroCliente = useMutation({
     mutationFn: cadastrarCliente,
     retry: false,
@@ -60,6 +62,30 @@ export function PaginaClientes() {
           Cadastre um cliente ou consulte os dados a partir de um UUID conhecido.
         </Typography>
       </Box>
+
+      <Card component="section" aria-labelledby="lista-clientes-titulo" variant="outlined">
+        <CardContent>
+          <Stack spacing={2}>
+            <Box>
+              <Typography id="lista-clientes-titulo" component="h2" variant="h5" gutterBottom>
+                Clientes cadastrados
+              </Typography>
+              <Typography color="text.secondary">Consulte rapidamente os clientes disponiveis no ambiente.</Typography>
+            </Box>
+            <TextField label="Buscar por nome ou e-mail" value={busca} onChange={(evento) => setBusca(evento.target.value)} />
+            {clientes.isLoading && <Typography color="text.secondary">Carregando clientes...</Typography>}
+            {clientes.isError && <AlertaErro erro={clientes.error} titulo="Nao foi possivel carregar os clientes" />}
+            {!clientes.isLoading && !clientes.isError && clientes.data?.itens.length === 0 && (
+              <Typography color="text.secondary">Nenhum cliente encontrado.</Typography>
+            )}
+            {clientes.data?.itens.map((cliente) => (
+              <Button key={cliente.id} onClick={() => navegar(`/clientes/${cliente.id}`)} sx={{ justifyContent: 'flex-start' }} variant="outlined">
+                {cliente.nome} — {cliente.email}
+              </Button>
+            ))}
+          </Stack>
+        </CardContent>
+      </Card>
 
       <Box
         sx={{

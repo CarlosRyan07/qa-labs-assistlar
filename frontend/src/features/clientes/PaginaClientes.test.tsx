@@ -1,13 +1,14 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { createMemoryRouter, RouterProvider, useLocation } from 'react-router-dom'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { cadastrarCliente } from './api/clientes-api'
+import { cadastrarCliente, listarClientes } from './api/clientes-api'
 import { PaginaClientes } from './PaginaClientes'
 
 vi.mock('./api/clientes-api', () => ({
   cadastrarCliente: vi.fn(),
+  listarClientes: vi.fn(),
 }))
 
 function Destino() {
@@ -38,6 +39,24 @@ function renderizarPagina() {
 describe('PaginaClientes', () => {
   afterEach(() => {
     vi.clearAllMocks()
+  })
+
+  beforeEach(() => {
+    vi.mocked(listarClientes).mockResolvedValue({ itens: [], pagina: 0, tamanho: 20, totalItens: 0, totalPaginas: 0 })
+  })
+
+  it('exibe clientes retornados pela listagem e navega para o detalhe', async () => {
+    vi.mocked(listarClientes).mockResolvedValue({
+      itens: [{
+        id: '8d8c18af-760d-4b37-938b-b7c11b68be34', nome: 'Ana Silva', email: 'ana@exemplo.com',
+        dataNascimento: '1990-05-10', status: 'ATIVO', criadoEm: '2026-08-16T12:00:00Z', atualizadoEm: '2026-08-16T12:00:00Z',
+      }], pagina: 0, tamanho: 20, totalItens: 1, totalPaginas: 1,
+    })
+    renderizarPagina()
+
+    expect(await screen.findByRole('button', { name: /Ana Silva/ })).toBeVisible()
+    fireEvent.click(screen.getByRole('button', { name: /Ana Silva/ }))
+    expect(await screen.findByText('Destino: /clientes/8d8c18af-760d-4b37-938b-b7c11b68be34')).toBeVisible()
   })
 
   it('cadastra o cliente e navega para o detalhe retornado pela API', async () => {

@@ -4,6 +4,9 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Locale;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,8 @@ import br.com.ryanqalabs.assistlar.cliente.dominio.Cliente;
 import br.com.ryanqalabs.assistlar.cliente.infraestrutura.ClienteRepository;
 import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoConflito;
 import br.com.ryanqalabs.assistlar.compartilhado.erro.RecursoNaoEncontradoException;
+import br.com.ryanqalabs.assistlar.compartilhado.api.PaginaResposta;
+import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoDadosInvalidos;
 
 @Service
 public class ClienteService {
@@ -43,6 +48,20 @@ public class ClienteService {
     @Transactional(readOnly = true)
     public ClienteResposta buscar(UUID id) {
         return ClienteResposta.de(buscarEntidade(id));
+    }
+
+    @Transactional(readOnly = true)
+    public PaginaResposta<ClienteResposta> listar(String busca, int pagina, int tamanho) {
+        if (pagina < 0 || tamanho < 1 || tamanho > 100) {
+            throw new ExcecaoDadosInvalidos("paginacao-invalida", "Pagina deve ser maior ou igual a zero e tamanho deve estar entre 1 e 100.");
+        }
+        String termo = busca == null ? "" : busca.strip();
+        PageRequest paginacao = PageRequest.of(pagina, tamanho, Sort.by(Sort.Direction.ASC, "nome"));
+        Page<Cliente> clientes = termo.isBlank()
+                ? repository.findAll(paginacao)
+                : repository.findByNomeContainingIgnoreCaseOrEmailContainingIgnoreCase(termo, termo, paginacao);
+        return new PaginaResposta<>(clientes.map(ClienteResposta::de).getContent(), clientes.getNumber(),
+                clientes.getSize(), clientes.getTotalElements(), clientes.getTotalPages());
     }
 
     @Transactional
