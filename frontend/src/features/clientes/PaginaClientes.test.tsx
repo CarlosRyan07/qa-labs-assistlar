@@ -59,6 +59,14 @@ describe('PaginaClientes', () => {
     expect(await screen.findByText('Destino: /clientes/8d8c18af-760d-4b37-938b-b7c11b68be34')).toBeVisible()
   })
 
+  it('expõe estado vazio como mensagem anunciável', async () => {
+    renderizarPagina()
+
+    const vazio = await screen.findByText('Nenhum cliente encontrado.')
+    expect(vazio).toHaveAttribute('aria-live', 'polite')
+    expect(screen.getByRole('region', { name: 'Clientes cadastrados' })).toHaveAttribute('aria-busy', 'false')
+  })
+
   it('cadastra o cliente e navega para o detalhe retornado pela API', async () => {
     vi.mocked(cadastrarCliente).mockResolvedValue({
       id: '8d8c18af-760d-4b37-938b-b7c11b68be34',
