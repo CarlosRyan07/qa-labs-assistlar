@@ -2,6 +2,18 @@ import { requisitarJson } from '../../shared/api/http'
 
 import type { Contratacao, ContratacaoCriacao, HistoricoContratacao } from './tipos'
 
+export interface PaginaContratacoes {
+  itens: Contratacao[]
+  pagina: number
+  tamanho: number
+  totalItens: number
+  totalPaginas: number
+}
+
+export function listarContratacoes(clienteId: string): Promise<PaginaContratacoes> {
+  return requisitarJson<PaginaContratacoes>(`/contratacoes?clienteId=${encodeURIComponent(clienteId)}`)
+}
+
 export function criarContratacao(dados: ContratacaoCriacao): Promise<Contratacao> {
   return requisitarJson<Contratacao>('/contratacoes', {
     method: 'POST',

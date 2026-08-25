@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import br.com.ryanqalabs.assistlar.compartilhado.configuracao.TempoConfiguracao;
 import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoRegraNegocio;
+import br.com.ryanqalabs.assistlar.compartilhado.api.PaginaResposta;
 import br.com.ryanqalabs.assistlar.contratacao.aplicacao.ContratacaoService;
 import br.com.ryanqalabs.assistlar.contratacao.dominio.StatusContratacao;
 import br.com.ryanqalabs.assistlar.historico.api.HistoricoStatusResposta;
@@ -78,6 +79,17 @@ class ContratacaoControllerTest {
         mockMvc.perform(get("/api/contratacoes/{id}/historico", CONTRATACAO_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].tipoResponsavel").value("CLIENTE"));
+    }
+
+    @Test
+    void deveListarContratacoesPorCliente() throws Exception {
+        when(service.listarPorCliente(CLIENTE_ID, 0, 20)).thenReturn(new PaginaResposta<>(
+                List.of(resposta(StatusContratacao.PENDENTE)), 0, 20, 1, 1));
+
+        mockMvc.perform(get("/api/contratacoes").queryParam("clienteId", CLIENTE_ID.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.itens[0].status").value("PENDENTE"))
+                .andExpect(jsonPath("$.totalItens").value(1));
     }
 
     @Test

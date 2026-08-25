@@ -138,3 +138,16 @@ pela API, para concentrar a evidência da UI no cancelamento em atendimento. Em
 falhas, Playwright preserva trace, screenshot e vídeo em `test-results/` e gera
 o relatório HTML em `playwright-report/`; ambos são artefatos locais ignorados
 pelo Git.
+
+### Regressao visual
+
+A regressao visual cobre a pagina inicial com uma baseline versionada em
+`e2e/regressao-visual.spec.ts-snapshots/`. Para atualizar a imagem de referencia
+apos uma mudanca visual intencional, execute `npm run test:e2e -- --grep
+"regressao visual" --update-snapshots`; para validar a imagem existente, use o
+mesmo comando sem `--update-snapshots`. Snapshots sao revisados como codigo e
+nao devem ser atualizados para mascarar alteracoes acidentais.
+
+A baseline visual e mantida somente no Chromium para reduzir diferencas de
+renderizacao entre engines. Firefox, WebKit e mobile Chromium continuam
+validando as jornadas funcionais na matriz completa.

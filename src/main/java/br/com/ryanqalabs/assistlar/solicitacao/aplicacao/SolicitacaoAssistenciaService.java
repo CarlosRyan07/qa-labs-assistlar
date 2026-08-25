@@ -5,6 +5,9 @@ import java.time.Instant;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -14,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoConflito;
 import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoRegraNegocio;
 import br.com.ryanqalabs.assistlar.compartilhado.erro.RecursoNaoEncontradoException;
+import br.com.ryanqalabs.assistlar.compartilhado.api.PaginaResposta;
+import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoDadosInvalidos;
 import br.com.ryanqalabs.assistlar.contratacao.dominio.Contratacao;
 import br.com.ryanqalabs.assistlar.contratacao.dominio.StatusContratacao;
 import br.com.ryanqalabs.assistlar.contratacao.infraestrutura.ContratacaoRepository;
@@ -92,6 +97,17 @@ public class SolicitacaoAssistenciaService {
     @Transactional(readOnly = true)
     public SolicitacaoResposta buscar(UUID id) {
         return SolicitacaoResposta.de(buscarEntidade(id));
+    }
+
+    @Transactional(readOnly = true)
+    public PaginaResposta<SolicitacaoResposta> listarPorContratacao(UUID contratacaoId, int pagina, int tamanho) {
+        if (pagina < 0 || tamanho < 1 || tamanho > 100) {
+            throw new ExcecaoDadosInvalidos("paginacao-invalida", "Pagina deve ser maior ou igual a zero e tamanho deve estar entre 1 e 100.");
+        }
+        Page<SolicitacaoAssistencia> solicitacoes = repository.findByContratacaoId(contratacaoId,
+                PageRequest.of(pagina, tamanho, Sort.by(Sort.Direction.DESC, "abertaEm")));
+        return new PaginaResposta<>(solicitacoes.map(SolicitacaoResposta::de).getContent(), solicitacoes.getNumber(),
+                solicitacoes.getSize(), solicitacoes.getTotalElements(), solicitacoes.getTotalPages());
     }
 
     @Transactional

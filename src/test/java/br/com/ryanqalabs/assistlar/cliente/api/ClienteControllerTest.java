@@ -2,6 +2,7 @@ package br.com.ryanqalabs.assistlar.cliente.api;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -25,6 +26,7 @@ import br.com.ryanqalabs.assistlar.cliente.dominio.StatusCliente;
 import br.com.ryanqalabs.assistlar.compartilhado.configuracao.TempoConfiguracao;
 import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoConflito;
 import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoRegraNegocio;
+import br.com.ryanqalabs.assistlar.compartilhado.api.PaginaResposta;
 
 @WebMvcTest(ClienteController.class)
 @Import(TempoConfiguracao.class)
@@ -104,6 +106,20 @@ class ClienteControllerTest {
         mockMvc.perform(post("/api/clientes/{id}/reativacao", CLIENTE_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("ATIVO"));
+    }
+
+    @Test
+    void deveListarClientesComBuscaEPaginacao() throws Exception {
+        when(service.listar("ana", 0, 20)).thenReturn(new PaginaResposta<>(
+                java.util.List.of(resposta(StatusCliente.ATIVO)), 0, 20, 1, 1));
+
+        mockMvc.perform(get("/api/clientes").queryParam("busca", "ana"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.itens.length()").value(1))
+                .andExpect(jsonPath("$.itens[0].nome").value("Ana Silva"))
+                .andExpect(jsonPath("$.totalItens").value(1));
+
+        verify(service).listar("ana", 0, 20);
     }
 
     @Test

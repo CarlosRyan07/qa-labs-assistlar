@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import br.com.ryanqalabs.assistlar.compartilhado.configuracao.TempoConfiguracao;
 import br.com.ryanqalabs.assistlar.compartilhado.erro.ExcecaoRegraNegocio;
+import br.com.ryanqalabs.assistlar.compartilhado.api.PaginaResposta;
 import br.com.ryanqalabs.assistlar.historico.api.HistoricoStatusResposta;
 import br.com.ryanqalabs.assistlar.historico.dominio.TipoResponsavel;
 import br.com.ryanqalabs.assistlar.plano.dominio.TipoAssistencia;
@@ -75,6 +76,17 @@ class SolicitacaoAssistenciaControllerTest {
                 .andExpect(status().isOk()).andExpect(jsonPath("$.status").value("CANCELADA"));
         mockMvc.perform(get("/api/solicitacoes-assistencia/{id}/historico", SOLICITACAO_ID))
                 .andExpect(status().isOk()).andExpect(jsonPath("$[0].tipoResponsavel").value("CLIENTE"));
+    }
+
+    @Test
+    void deveListarSolicitacoesPorContratacao() throws Exception {
+        when(service.listarPorContratacao(CONTRATACAO_ID, 0, 20)).thenReturn(new PaginaResposta<>(
+                List.of(resposta(StatusSolicitacao.ABERTA)), 0, 20, 1, 1));
+
+        mockMvc.perform(get("/api/solicitacoes-assistencia").queryParam("contratacaoId", CONTRATACAO_ID.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.itens[0].status").value("ABERTA"))
+                .andExpect(jsonPath("$.totalItens").value(1));
     }
 
     @Test

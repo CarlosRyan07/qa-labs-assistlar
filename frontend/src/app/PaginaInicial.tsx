@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Card, CardContent, Chip, Stack, Typography } from '@mui/material'
+import { Alert, Box, Button, Card, CardContent, Chip, Divider, Stack, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 
@@ -25,12 +25,27 @@ export function PaginaInicial() {
 
   return (
     <Stack spacing={4}>
-      <Box>
+      <Box
+        sx={{
+          position: 'relative',
+          overflow: 'hidden',
+          borderRadius: 4,
+          px: { xs: 3, md: 6 },
+          py: { xs: 4, md: 6 },
+          color: 'common.white',
+          background: 'linear-gradient(120deg, #0a2840 0%, #123b5d 56%, #23708c 100%)',
+          boxShadow: '0 16px 40px rgba(18, 59, 93, 0.18)',
+        }}
+      >
         <Chip label="Frontend v0.2.0" color="secondary" sx={{ mb: 2 }} />
         <Typography component="h1" variant="h2" gutterBottom>
           Assistência residencial com uma jornada clara e testável
         </Typography>
-        <Typography component="p" variant="h6" color="text.secondary" sx={{ maxWidth: 760 }}>
+        <Typography
+          component="p"
+          variant="h6"
+          sx={{ maxWidth: 760, color: 'rgba(255,255,255,0.82)' }}
+        >
           Interface Web autoral para demonstrar práticas de Full Stack Quality
           Engineering sobre o domínio do AssistLar.
         </Typography>
@@ -67,7 +82,7 @@ export function PaginaInicial() {
         {planos.data && planos.data.length > 0 && (
           <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' } }}>
             {planos.data.map((plano) => (
-              <Card key={plano.id} variant="outlined">
+              <Card key={plano.id} variant="outlined" sx={{ height: '100%' }}>
                 <CardContent>
                   <Stack spacing={1.5}>
                     <Chip label={plano.codigo} size="small" sx={{ alignSelf: 'flex-start' }} />
@@ -78,6 +93,7 @@ export function PaginaInicial() {
                       {plano.coberturas.length}{' '}
                       {plano.coberturas.length === 1 ? 'cobertura ativa' : 'coberturas ativas'}
                     </Typography>
+                    <Divider />
                     <Button component={Link} to={`/planos/${plano.id}`} sx={{ alignSelf: 'flex-start' }}>
                       Consultar coberturas de {plano.nome}
                     </Button>
@@ -103,7 +119,7 @@ export function PaginaInicial() {
         </Typography>
 
         {pilares.map((pilar) => (
-          <Card key={pilar.titulo} variant="outlined">
+          <Card key={pilar.titulo} variant="outlined" sx={{ height: '100%' }}>
             <CardContent>
               <Typography component="h3" variant="h6" gutterBottom>
                 {pilar.titulo}

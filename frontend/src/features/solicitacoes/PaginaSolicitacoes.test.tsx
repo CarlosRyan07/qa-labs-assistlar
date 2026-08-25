@@ -1,13 +1,14 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { createMemoryRouter, RouterProvider, useLocation } from 'react-router-dom'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { abrirSolicitacao } from './api/solicitacoes-api'
+import { abrirSolicitacao, listarSolicitacoes } from './api/solicitacoes-api'
 import { PaginaSolicitacoes } from './PaginaSolicitacoes'
 
 vi.mock('./api/solicitacoes-api', () => ({
   abrirSolicitacao: vi.fn(),
+  listarSolicitacoes: vi.fn(),
 }))
 
 const contratacaoId = '10000000-0000-4000-8000-000000000001'
@@ -41,6 +42,10 @@ function renderizarPagina(entrada = '/solicitacoes/nova') {
 describe('PaginaSolicitacoes', () => {
   afterEach(() => {
     vi.clearAllMocks()
+  })
+
+  beforeEach(() => {
+    vi.mocked(listarSolicitacoes).mockResolvedValue({ itens: [], pagina: 0, tamanho: 20, totalItens: 0, totalPaginas: 0 })
   })
 
   it('prefill a contratacao da jornada, abre a solicitacao e navega para o detalhe', async () => {

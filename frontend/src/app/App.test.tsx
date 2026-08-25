@@ -50,6 +50,7 @@ describe('fundacao da aplicacao', () => {
         name: 'Assistência residencial com uma jornada clara e testável',
       }),
     ).toBeVisible()
+    expect(screen.getByRole('navigation', { name: 'Navegação principal' })).toBeInTheDocument()
   })
 
   it('apresenta os três princípios da fundação', () => {

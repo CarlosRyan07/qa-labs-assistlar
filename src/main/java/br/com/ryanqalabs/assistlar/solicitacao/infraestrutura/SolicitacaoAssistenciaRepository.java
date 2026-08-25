@@ -3,6 +3,8 @@ package br.com.ryanqalabs.assistlar.solicitacao.infraestrutura;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +18,9 @@ public interface SolicitacaoAssistenciaRepository extends JpaRepository<Solicita
     @Override
     @EntityGraph(attributePaths = {"contratacao", "contratacao.cliente", "contratacao.planoAssistencia"})
     Optional<SolicitacaoAssistencia> findById(UUID id);
+
+    @EntityGraph(attributePaths = {"contratacao", "contratacao.cliente", "contratacao.planoAssistencia"})
+    Page<SolicitacaoAssistencia> findByContratacaoId(UUID contratacaoId, Pageable pageable);
 
     boolean existsByContratacaoIdAndTipoAssistenciaAndStatusIn(UUID contratacaoId,
             TipoAssistencia tipoAssistencia, Collection<StatusSolicitacao> status);
