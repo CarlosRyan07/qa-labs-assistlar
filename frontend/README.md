@@ -147,3 +147,7 @@ apos uma mudanca visual intencional, execute `npm run test:e2e -- --grep
 "regressao visual" --update-snapshots`; para validar a imagem existente, use o
 mesmo comando sem `--update-snapshots`. Snapshots sao revisados como codigo e
 nao devem ser atualizados para mascarar alteracoes acidentais.
+
+A baseline visual e mantida somente no Chromium para reduzir diferencas de
+renderizacao entre engines. Firefox, WebKit e mobile Chromium continuam
+validando as jornadas funcionais na matriz completa.

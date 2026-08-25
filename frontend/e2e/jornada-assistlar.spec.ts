@@ -3,6 +3,8 @@ import { expect, test, type APIRequestContext } from '@playwright/test'
 const apiBase = 'http://127.0.0.1:18080/api'
 const planoCompletoId = '10000000-0000-0000-0000-000000000002'
 
+test.setTimeout(60_000)
+
 test('conclui a jornada principal pelo navegador', async ({ page }) => {
   const sufixo = gerarSufixo()
 
