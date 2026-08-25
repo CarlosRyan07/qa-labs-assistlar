@@ -63,7 +63,7 @@ export function PaginaClientes() {
         </Typography>
       </Box>
 
-      <Card component="section" aria-labelledby="lista-clientes-titulo" variant="outlined">
+      <Card component="section" aria-labelledby="lista-clientes-titulo" aria-busy={clientes.isLoading} variant="outlined">
         <CardContent>
           <Stack spacing={2}>
             <Box>
@@ -73,10 +73,10 @@ export function PaginaClientes() {
               <Typography color="text.secondary">Consulte rapidamente os clientes disponiveis no ambiente.</Typography>
             </Box>
             <TextField label="Buscar por nome ou e-mail" value={busca} onChange={(evento) => setBusca(evento.target.value)} />
-            {clientes.isLoading && <Typography color="text.secondary">Carregando clientes...</Typography>}
+            {clientes.isLoading && <Typography aria-live="polite" color="text.secondary">Carregando clientes...</Typography>}
             {clientes.isError && <AlertaErro erro={clientes.error} titulo="Nao foi possivel carregar os clientes" />}
             {!clientes.isLoading && !clientes.isError && clientes.data?.itens.length === 0 && (
-              <Typography color="text.secondary">Nenhum cliente encontrado.</Typography>
+              <Typography aria-live="polite" color="text.secondary">Nenhum cliente encontrado.</Typography>
             )}
             {clientes.data?.itens.map((cliente) => (
               <Button key={cliente.id} onClick={() => navegar(`/clientes/${cliente.id}`)} sx={{ justifyContent: 'flex-start' }} variant="outlined">

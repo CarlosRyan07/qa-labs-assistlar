@@ -88,7 +88,7 @@ export function PaginaSolicitacoes() {
         </Typography>
       </Box>
 
-      <Card component="section" aria-labelledby="lista-solicitacoes-titulo" variant="outlined">
+      <Card component="section" aria-labelledby="lista-solicitacoes-titulo" aria-busy={lista.isLoading} variant="outlined">
         <CardContent>
           <Stack spacing={2}>
             <Box>
@@ -99,9 +99,9 @@ export function PaginaSolicitacoes() {
             </Box>
             <TextField label="UUID da contratacao para listar" value={contratacaoBusca} onChange={(evento) => setContratacaoBusca(evento.target.value)} />
             {!ehUuid(contratacaoBusca) && <Typography color="text.secondary">A consulta sera habilitada quando o UUID for valido.</Typography>}
-            {lista.isLoading && <Typography color="text.secondary">Carregando solicitacoes...</Typography>}
+            {lista.isLoading && <Typography aria-live="polite" color="text.secondary">Carregando solicitacoes...</Typography>}
             {lista.isError && <AlertaErro erro={lista.error} titulo="Nao foi possivel carregar as solicitacoes" />}
-            {!lista.isLoading && !lista.isError && lista.data?.itens.length === 0 && <Typography color="text.secondary">Nenhuma solicitacao encontrada.</Typography>}
+            {!lista.isLoading && !lista.isError && lista.data?.itens.length === 0 && <Typography aria-live="polite" color="text.secondary">Nenhuma solicitacao encontrada.</Typography>}
             {lista.data?.itens.map((solicitacao) => (
               <Button key={solicitacao.id} onClick={() => navegar(`/solicitacoes/${solicitacao.id}`)} sx={{ justifyContent: 'flex-start' }} variant="outlined">
                 {solicitacao.tipoAssistencia} — {solicitacao.status}
