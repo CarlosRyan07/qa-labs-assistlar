@@ -483,3 +483,11 @@ O Vitest exclui `e2e/**` da descoberta de testes para não coletar specs do
 Playwright. Essa separação mantém o quality gate baseado exclusivamente no
 código fonte e nos testes unitários/componentes, sem reduzir os limites já
 estabelecidos.
+
+### Atualizacao da validacao cross-browser e visual
+
+A jornada Playwright foi validada em Chromium, Firefox, WebKit e mobile
+Chromium. A execucao completa registrou nove testes aprovados e tres cenarios
+visuais ignorados fora do Chromium, pois a baseline visual e mantida somente
+nessa engine para reduzir diferencas de renderizacao. As jornadas funcionais
+continuam obrigatorias em todos os projetos da matriz.
