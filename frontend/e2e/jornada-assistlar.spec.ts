@@ -7,9 +7,9 @@ test('conclui a jornada principal pelo navegador', async ({ page }) => {
   const sufixo = gerarSufixo()
 
   await page.goto('/clientes')
-  await page.getByLabel('Nome').fill(`Teste E2E ${sufixo}`)
-  await page.getByLabel('E-mail').fill(`teste-e2e-${sufixo}@example.test`)
-  await page.getByLabel('Data de nascimento').fill('1990-05-10')
+  await page.getByRole('textbox', { name: /^Nome/ }).fill(`Teste E2E ${sufixo}`)
+  await page.getByRole('textbox', { name: 'E-mail', exact: true }).fill(`teste-e2e-${sufixo}@example.test`)
+  await page.getByRole('textbox', { name: 'Data de nascimento', exact: true }).fill('1990-05-10')
   await page.getByRole('button', { name: 'Cadastrar cliente' }).click()
 
   await expect(page).toHaveURL(/\/clientes\/[0-9a-f-]{36}$/)
