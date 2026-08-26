@@ -29,6 +29,7 @@ Plataforma fictícia de assistências residenciais desenvolvida para demonstrar 
 - [Releases do projeto](https://github.com/CarlosRyan07/qa-labs-assistlar/releases)
 - [Evidências reproduzíveis](docs/evidencias.md)
 - [Estratégia de testes](#estratégia-de-testes) e [catálogo de cenários](docs/cenarios-de-teste.md)
+- [Cenários BDD documentados](docs/cenarios-bdd.md)
 - [Arquitetura do AssistLar](docs/arquitetura.md)
 - [Guia de execução local](docs/execucao-local.md)
 - [Collection Postman](postman/README.md) — requer a aplicação local em execução para enviar as requisições

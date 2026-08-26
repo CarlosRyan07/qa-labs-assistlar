@@ -2,6 +2,9 @@
 
 Este catálogo destaca riscos do domínio e onde eles são exercitados. Os testes permanecem independentes e usam dados determinísticos ou UUIDs gerados por cenário.
 
+Os cenários de maior valor também estão descritos em formato Gherkin, com estado
+e referência para a automação existente, em [cenarios-bdd.md](cenarios-bdd.md).
+
 ## Cliente
 
 | ID | Cenário | Nível |

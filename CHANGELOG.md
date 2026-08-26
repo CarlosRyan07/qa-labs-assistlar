@@ -10,6 +10,7 @@ Todas as alterações relevantes deste projeto serão documentadas neste arquivo
 
 - aplicação Web v0.2.0 em jornada guiada sobre o contrato real do backend;
 - listagens paginadas de clientes, contratações e solicitações para apoiar a jornada Web;
+- cenários BDD documentados em Gherkin, vinculados à automação já existente;
 - testes rápidos com Vitest e Testing Library;
 - Cypress Component Testing para componentes de maior risco;
 - Playwright E2E com jornada dourada, cenário negativo, cross-browser e perfil mobile;
