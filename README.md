@@ -13,18 +13,20 @@ Plataforma fictícia de assistências residenciais desenvolvida para demonstrar 
 
 ## Resultados em números
 
-- **81 testes automatizados**
-- **51 testes rápidos**
-- **30 testes de integração e API**
-- **97,07% de cobertura de instruções**
-- **95,71% de cobertura de branches**
+- **84 testes automatizados no backend**
+- **54 testes rápidos e 30 de integração/API**
+- **61 testes Vitest e 3 testes Cypress no frontend**
+- **9 testes Playwright aprovados na matriz E2E completa**
+- **90,75% de cobertura de instruções no backend**
+- **72,83% de cobertura de branches no backend**
+- **87,62% de statements e 86,24% de branches no frontend**
 - **31 requisições na collection Postman**
 - **18 caminhos documentados no OpenAPI 3.1**
-- **Release atual: v0.1.0**
+- **Release atual: v0.2.0**
 
 ## Acesso rápido
 
-- [Release v0.1.0](https://github.com/CarlosRyan07/qa-labs-assistlar/releases/tag/v0.1.0)
+- [Releases do projeto](https://github.com/CarlosRyan07/qa-labs-assistlar/releases)
 - [Evidências reproduzíveis](docs/evidencias.md)
 - [Estratégia de testes](#estratégia-de-testes) e [catálogo de cenários](docs/cenarios-de-teste.md)
 - [Arquitetura do AssistLar](docs/arquitetura.md)
@@ -42,6 +44,8 @@ Plataforma fictícia de assistências residenciais desenvolvida para demonstrar 
 - contrato OpenAPI verificado automaticamente;
 - quality gate de cobertura com JaCoCo;
 - ambiente reproduzível com Docker Compose.
+- interface React com testes de unidade, componentes, E2E e regressão visual;
+- baseline controlada de performance com k6.
 
 ## Domínio do MVP
 
@@ -201,7 +205,7 @@ Decisões da estratégia:
 - entidades e regras de domínio são exercitadas diretamente, sem mocks desnecessários;
 - antes de cada teste de integração, apenas os dados mutáveis são limpos; migrations, planos e coberturas de referência são preservados;
 - testes concorrentes usam barreiras determinísticas e timeout, nunca `Thread.sleep`;
-- Surefire executa os 51 testes rápidos, enquanto Failsafe complementa a execução com 30 testes de integração/API.
+- Surefire executa os 54 testes rápidos, enquanto Failsafe complementa a execução com 30 testes de integração/API.
 
 ## Testes e quality gate
 
@@ -279,10 +283,10 @@ A collection Postman possui 31 requisições, com jornadas positivas, cenários 
 
 ### Suíte automatizada
 
-A suíte completa possui 81 testes: 51 rápidos e 30 de integração/API.
+A suíte completa do backend possui 84 testes: 54 rápidos e 30 de integração/API.
 
 <details>
-<summary>Ver execução dos 81 testes automatizados</summary>
+<summary>Ver evidência histórica da execução inicial de 81 testes</summary>
 
 ![81 testes aprovados na suíte Maven](docs/assets/testes-81-build-success.png)
 
@@ -290,7 +294,7 @@ A suíte completa possui 81 testes: 51 rápidos e 30 de integração/API.
 
 ### Cobertura
 
-O JaCoCo registrou 97,07% de instruções e 95,71% de branches, acima do quality gate configurado.
+Na validação da v0.2.0, o JaCoCo registrou 90,75% de instruções e 72,83% de branches, acima do quality gate configurado (80% e 70%, respectivamente).
 
 ![Relatório de cobertura JaCoCo](docs/assets/jacoco-cobertura.png)
 
@@ -317,20 +321,19 @@ Os comandos, critérios e resultados completos estão nas [evidências reproduz�
 - testes concorrentes usam barreiras e timeout, nunca espera arbitrária;
 - `tipoResponsavel` é definido pelo caso de uso e rejeitado nos payloads.
 
-## Fora do escopo da v0.1.0
+## Limites atuais do produto
 
 - autenticação e autorização;
-- interface web e testes de interface;
-- testes de acessibilidade e performance;
+- testes especializados de acessibilidade;
 - notificações e integrações externas;
 - rede de prestadores, geolocalização e agendamento;
 - pagamentos, sinistros, corretor e vigência;
 - implantação em cloud e arquitetura de microsserviços.
 
-Próximas evoluções incluem automação especializada de acessibilidade e
-segurança básica. Os cenários de carga com k6 ficam documentados em
-[`performance-tests/`](performance-tests/), com perfil leve e execução manual
-controlada.
+Próximas evoluções incluem automação especializada de acessibilidade,
+segurança básica e uma estratégia de performance com workloads de negócio
+adicionais. O baseline atual de carga leve com k6 está em
+[`performance-tests/`](performance-tests/).
 
 ## Repositório e licença
 

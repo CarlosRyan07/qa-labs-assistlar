@@ -22,7 +22,7 @@ Baseline local de 20/07/2026: JDK 21 confirmado, Docker Engine 24.0.6 e Docker C
 
 Critério: todos os testes `*Test` aprovados.
 
-Baseline local: 51 testes rápidos aprovados.
+Baseline local da v0.2.0: 54 testes rápidos aprovados.
 
 ## Suíte completa
 
@@ -37,7 +37,21 @@ Critérios:
 - JaCoCo acima de 80% de instruções e 70% de branches;
 - relatório disponível em `target/site/jacoco/index.html`.
 
-Baseline local de 21/07/2026: 51 testes rápidos e 30 testes de integração/API aprovados, com 97,07% de instruções e 95,71% de branches cobertos.
+Baseline local da v0.2.0 em 26/08/2026: 54 testes rápidos e 30 testes de integração/API aprovados, com 90,75% de instruções e 72,83% de branches cobertos.
+
+## Frontend
+
+```bash
+cd frontend
+npm run test:coverage
+npm run test:component
+```
+
+Baseline local da v0.2.0: 61 testes Vitest aprovados, com 87,62% de statements,
+86,24% de branches, 80,70% de functions e 89,09% de lines; 3 testes Cypress
+Component aprovados. A matriz Playwright completa registrou 9 cenários aprovados
+e 3 cenários visuais ignorados fora do Chromium por decisão explícita de
+baseline.
 
 ## Container
 

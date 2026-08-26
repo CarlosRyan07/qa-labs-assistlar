@@ -431,8 +431,9 @@ Cypress, Playwright e novos endpoints permanecem fora do Marco 2.
 
 A suíte Vitest e Testing Library foi consolidada com testes de componentes,
 formulários, transições, fronteiras HTTP e estados seguros de erro. A medição
-com o provedor V8 registrou 89,83% de statements, 86,88% de branches, 85,25% de
-functions e 91,06% de lines, em 59 testes distribuídos por 18 arquivos.
+com o provedor V8 registrou 87,62% de statements, 86,24% de branches, 80,70% de
+functions e 89,09% de lines, em 61 testes distribuídos por 18 arquivos na
+validação de consolidação da v0.2.0.
 
 Com essa linha de base observada, o quality gate local passou a exigir 80% de
 statements, 70% de branches, 80% de functions e 80% de lines. Ele considera o
