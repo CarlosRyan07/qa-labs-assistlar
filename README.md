@@ -286,18 +286,25 @@ A collection Postman possui 31 requisições, com jornadas positivas, cenários 
 
 A suíte completa do backend possui 84 testes: 54 rápidos e 30 de integração/API.
 
-<details>
-<summary>Ver evidência histórica da execução inicial de 81 testes</summary>
-
-![81 testes aprovados na suíte Maven](docs/assets/testes-81-build-success.png)
-
-</details>
-
 ### Cobertura
 
 Na validação da v0.2.0, o JaCoCo registrou 90,75% de instruções e 72,83% de branches, acima do quality gate configurado (80% e 70%, respectivamente).
 
-![Relatório de cobertura JaCoCo](docs/assets/jacoco-cobertura.png)
+![Relatório JaCoCo da validação v0.2.0](docs/assets/jacoco-cobertura-v020.png)
+
+### Interface Web
+
+A interface React consome o backend real e apresenta planos, clientes,
+contratações e solicitações sem dados simulados.
+
+![Tela inicial do frontend AssistLar v0.2.0](docs/assets/frontend-tela-inicial-v020.png)
+
+### Qualidade do frontend
+
+O Vitest registrou 61 testes aprovados e cobertura acima dos limites definidos
+para statements, branches, functions e lines.
+
+![Relatório Vitest da validação v0.2.0](docs/assets/vitest-cobertura-v020.png)
 
 ### Ambiente reproduzível
 
