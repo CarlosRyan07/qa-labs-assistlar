@@ -306,6 +306,15 @@ para statements, branches, functions e lines.
 
 ![Relatório Vitest da validação v0.2.0](docs/assets/vitest-cobertura-v020.png)
 
+### Jornada E2E com Playwright
+
+O GIF abaixo foi gerado por capturas sequenciais do Playwright contra o
+ambiente E2E isolado, com Spring Boot e PostgreSQL reais. Ele reproduz a
+jornada automatizada de cadastro, elegibilidade, ativação de contratação e
+conclusão da assistência.
+
+![Jornada E2E do AssistLar executada pelo Playwright](docs/assets/playwright-jornada-v020.gif)
+
 ### Ambiente reproduzível
 
 A aplicação e o PostgreSQL são iniciados pelo Docker Compose com health checks.

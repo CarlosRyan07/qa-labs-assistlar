@@ -105,6 +105,7 @@ As imagens complementam os comandos reproduzíveis e registram a validação vis
 - [Cobertura JaCoCo da v0.2.0](assets/jacoco-cobertura-v020.png)
 - [Cobertura Vitest da v0.2.0](assets/vitest-cobertura-v020.png)
 - [Tela inicial do frontend v0.2.0](assets/frontend-tela-inicial-v020.png)
+- [Jornada E2E Playwright da v0.2.0](assets/playwright-jornada-v020.gif)
 - [Docker Compose saudável](assets/docker-compose-healthy.png)
 - [Pipeline de qualidade aprovada no GitHub Actions](assets/github-actions-ci-aprovada.png)
 - [Falha detectada pela CI e merge bloqueado](assets/github-actions-merge-bloqueado.png)
