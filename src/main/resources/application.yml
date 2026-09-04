@@ -2,7 +2,7 @@ spring:
   application:
     name: assistlar
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/assistlar}
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/assistlar}
     username: ${DB_USERNAME:assistlar}
     password: ${DB_PASSWORD:assistlar}
   flyway:

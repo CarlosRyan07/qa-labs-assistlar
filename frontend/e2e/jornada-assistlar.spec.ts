@@ -1,6 +1,6 @@
 import { expect, test, type APIRequestContext } from '@playwright/test'
 
-const apiBase = 'http://127.0.0.1:18080/api'
+const apiBase = `${process.env.PLAYWRIGHT_API_URL || 'http://127.0.0.1:8080'}/api`
 const planoCompletoId = '10000000-0000-0000-0000-000000000002'
 
 test.setTimeout(60_000)

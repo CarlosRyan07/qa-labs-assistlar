@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
+const destinoApi = process.env.PLAYWRIGHT_API_URL || 'http://127.0.0.1:8080'
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
@@ -22,11 +24,11 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev -- --host 127.0.0.1',
     url: 'http://127.0.0.1:5173',
-    reuseExistingServer: false,
+    reuseExistingServer: !process.env.CI && !process.env.PLAYWRIGHT_API_URL,
     timeout: 30_000,
     env: {
       VITE_API_URL: '/api',
-      API_PROXY_TARGET: 'http://127.0.0.1:18080',
+      API_PROXY_TARGET: destinoApi,
     },
   },
 })
