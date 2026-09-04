@@ -308,12 +308,12 @@ para statements, branches, functions e lines.
 
 ### Jornada E2E com Playwright
 
-O GIF abaixo foi gerado por capturas sequenciais do Playwright contra o
-ambiente E2E isolado, com Spring Boot e PostgreSQL reais. Ele reproduz a
-jornada automatizada de cadastro, elegibilidade, ativação de contratação e
+O registro abaixo mostra a jornada aprovada no Playwright UI, contra o
+ambiente E2E isolado com Spring Boot e PostgreSQL reais. Ele evidencia a
+execução automatizada de cadastro, elegibilidade, ativação de contratação e
 conclusão da assistência.
 
-![Jornada E2E do AssistLar executada pelo Playwright](docs/assets/playwright-jornada-v020.gif)
+![Jornada E2E do AssistLar executada pelo Playwright](docs/assets/playwright-jornada-v020.png)
 
 ### Ambiente reproduzível
 
@@ -354,6 +354,6 @@ adicionais. O baseline atual de carga leve com k6 está em
 
 ## Repositório e licença
 
-O AssistLar é o primeiro projeto público do **Ryan QA Labs**, iniciativa criada para transformar experiência profissional em projetos autorais, reproduzíveis e documentados.
+O AssistLar é o primeiro projeto público do **QA Labs**, iniciativa criada para transformar experiência profissional em projetos autorais, reproduzíveis e documentados.
 
 Distribuído sob a [licença MIT](LICENSE).
