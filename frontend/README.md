@@ -60,10 +60,9 @@ do AssistLar em execução. O frontend fica disponível por padrão em
 
 ## Limite funcional atual
 
-A API `v0.1.0` lista apenas planos. A Web será uma jornada guiada: recursos
-criados são acessados pelo UUID retornado, e recursos conhecidos podem ser
-consultados por UUID. O frontend não simula listagens ou métricas ausentes no
-backend.
+A Web utiliza as listagens reais de clientes, contratações e solicitações,
+além da listagem de planos. Recursos também podem ser consultados diretamente
+por UUID. O frontend não simula métricas ou capacidades ausentes no backend.
 
 ## Jornada funcional
 

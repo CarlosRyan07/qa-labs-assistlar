@@ -13,22 +13,27 @@ Plataforma fictícia de assistências residenciais desenvolvida para demonstrar 
 
 ## Resultados em números
 
-- **81 testes automatizados**
-- **51 testes rápidos**
-- **30 testes de integração e API**
-- **97,07% de cobertura de instruções**
-- **95,71% de cobertura de branches**
+- **88 testes automatizados no backend**
+- **55 testes rápidos e 33 de integração/API**
+- **61 testes Vitest e 3 testes Cypress no frontend**
+- **9 testes Playwright aprovados na matriz E2E completa**
+- **97,31% de cobertura de instruções no backend**
+- **98,91% de cobertura de branches no backend**
+- **87,62% de statements e 86,24% de branches no frontend**
 - **31 requisições na collection Postman**
 - **18 caminhos documentados no OpenAPI 3.1**
-- **Release atual: v0.1.0**
+- **204 requisições no workload k6, sem falhas ou iterações descartadas**
+- **Release atual: v0.2.0**
 
 ## Acesso rápido
 
-- [Release v0.1.0](https://github.com/CarlosRyan07/qa-labs-assistlar/releases/tag/v0.1.0)
+- [Releases do projeto](https://github.com/CarlosRyan07/qa-labs-assistlar/releases)
 - [Evidências reproduzíveis](docs/evidencias.md)
 - [Estratégia de testes](#estratégia-de-testes) e [catálogo de cenários](docs/cenarios-de-teste.md)
+- [Cenários BDD documentados](docs/cenarios-bdd.md)
 - [Arquitetura do AssistLar](docs/arquitetura.md)
 - [Guia de execução local](docs/execucao-local.md)
+- [Estratégia de performance com k6](performance-tests/README.md)
 - [Collection Postman](postman/README.md) — requer a aplicação local em execução para enviar as requisições
 - [Swagger UI](http://localhost:8080/swagger-ui.html) e [contrato OpenAPI](http://localhost:8080/v3/api-docs) — disponíveis somente com a aplicação local em execução
 
@@ -42,6 +47,8 @@ Plataforma fictícia de assistências residenciais desenvolvida para demonstrar 
 - contrato OpenAPI verificado automaticamente;
 - quality gate de cobertura com JaCoCo;
 - ambiente reproduzível com Docker Compose.
+- interface React com testes de unidade, componentes, E2E e regressão visual;
+- estratégia de performance com smoke test, workloads simultâneos e thresholds por endpoint no k6.
 
 ## Domínio do MVP
 
@@ -82,6 +89,43 @@ flowchart LR
 Pacote-base: `br.com.ryanqalabs.assistlar`.
 
 Módulos: `cliente`, `plano`, `elegibilidade`, `contratacao`, `solicitacao`, `historico` e `compartilhado`. Veja [a documentação de arquitetura](docs/arquitetura.md).
+
+### Estrutura do repositório
+
+```text
+📦 qa-labs-assistlar/
+├── 📁 .github/workflows/             # Pipeline de CI com quality gates
+├── 📁 docs/                          # Arquitetura, ADRs, cenários e evidências
+│   ├── 📁 adr/                       # Decisões arquiteturais registradas
+│   ├── 📁 architecture/              # Planejamento técnico da evolução Web
+│   └── 📁 assets/                    # Evidências visuais selecionadas
+├── 📁 frontend/                      # Aplicação React e automação Web
+│   ├── 📁 e2e/                       # Jornadas e regressão visual Playwright
+│   │   └── 📄 compose.e2e.yml        # Ambiente efêmero dos testes E2E
+│   └── 📁 src/
+│       ├── 📁 app/                   # Composição, rotas e layout
+│       ├── 📁 features/              # Clientes, planos, contratações e solicitações
+│       ├── 📁 shared/                # API, componentes e utilitários compartilhados
+│       └── 📁 test/                  # Configuração e suporte dos testes rápidos
+├── 📁 performance-tests/
+│   └── 📁 k6/                        # Smoke test e workload de carga
+├── 📁 postman/                       # Collection, ambiente e guia de execução
+├── 📁 src/
+│   ├── 📁 main/
+│   │   ├── 📁 java/br/com/ryanqalabs/assistlar/
+│   │   │   ├── 📁 cliente/           # Cadastro e ciclo de vida
+│   │   │   ├── 📁 plano/             # Planos e coberturas
+│   │   │   ├── 📁 elegibilidade/     # Regras para contratação
+│   │   │   ├── 📁 contratacao/       # Adesão e transições
+│   │   │   ├── 📁 solicitacao/       # Assistências, limites e concorrência
+│   │   │   ├── 📁 historico/         # Registro transacional de estados
+│   │   │   └── 📁 compartilhado/     # Erros e contratos comuns
+│   │   └── 📁 resources/db/migration # Migrations Flyway
+│   └── 📁 test/java/                 # JUnit, MockMvc, REST Assured e Testcontainers
+├── 📄 compose.yaml                   # Ambiente local da aplicação
+├── 📄 Dockerfile                     # Build multi-stage do backend
+└── 📄 pom.xml                        # Build, dependências e quality gate Java
+```
 
 ## Stack
 
@@ -190,6 +234,7 @@ A suíte foi organizada em camadas para equilibrar feedback rápido, fidelidade 
 | Concorrência | JUnit 5, `CountDownLatch` e PostgreSQL | Unicidade, locking, conflitos simultâneos e consistência final do banco |
 | Contrato | REST Assured e Springdoc OpenAPI | Disponibilidade do contrato OpenAPI 3.1 e presença dos caminhos públicos esperados |
 | Cobertura | JaCoCo | Quality gate de instruções e branches no código relevante |
+| Performance | k6 | Smoke test, carga simultânea, percentis, taxa de erros e iterações descartadas |
 | Testes manuais | Postman e Swagger UI | Exploração reproduzível da API, fluxos positivos e respostas negativas |
 
 Decisões da estratégia:
@@ -201,7 +246,28 @@ Decisões da estratégia:
 - entidades e regras de domínio são exercitadas diretamente, sem mocks desnecessários;
 - antes de cada teste de integração, apenas os dados mutáveis são limpos; migrations, planos e coberturas de referência são preservados;
 - testes concorrentes usam barreiras determinísticas e timeout, nunca `Thread.sleep`;
-- Surefire executa os 51 testes rápidos, enquanto Failsafe complementa a execução com 30 testes de integração/API.
+- Surefire executa os 55 testes rápidos, enquanto Failsafe complementa a execução com 33 testes de integração/API.
+
+## Mapeamento da suíte de testes
+
+Os identificadores abaixo representam riscos e comportamentos verificáveis, não
+uma relação de um ID para cada método automatizado. O detalhamento está no
+[catálogo de cenários](docs/cenarios-de-teste.md) e nos
+[cenários BDD](docs/cenarios-bdd.md).
+
+| IDs | Área ou objetivo | Tipos principais | Status |
+|---|---|---|---|
+| `CLI-01`–`CLI-10` | cadastro, idade, nome, e-mail, estado, busca e paginação | unitário e API | ✅ Aprovado |
+| `ELE-01`–`ELE-05` | elegibilidade e ausência de efeito colateral | unitário e API | ✅ Aprovado |
+| `CON-01`–`CON-08` | contratação, transições, histórico e concorrência | unitário, API e banco | ✅ Aprovado |
+| `SOL-01`–`SOL-13` | cobertura, limites, cancelamento e concorrência | unitário, API e banco | ✅ Aprovado |
+| `API-01`–`API-03` | OpenAPI, payloads e segurança das respostas de erro | contrato e API | ✅ Aprovado |
+| `OPS-01`–`OPS-03` | Flyway, health check e containers | integração e operação | ✅ Aprovado |
+| `BDD-CLI/ELE/CON/SOL` | sete cenários críticos escritos em Gherkin | documentação BDD vinculada à automação | ✅ Coberto |
+| `WEB-UNIT` | 61 verificações de componentes, hooks e páginas | Vitest e Testing Library | ✅ Aprovado |
+| `CMP-01`–`CMP-03` | foco, validação e cancelamento na interface | Cypress Component | ✅ Aprovado |
+| `E2E-01`–`E2E-03` | jornada principal, regra negativa e regressão visual | Playwright Full Stack | ✅ Aprovado |
+| `PERF-01`–`PERF-03` | smoke, carga simultânea e thresholds | k6 | ✅ Aprovado |
 
 ## Testes e quality gate
 
@@ -244,12 +310,7 @@ Durante a validação, o PostgreSQL real é iniciado pelo Testcontainers, sem se
 
 Ao final de cada execução, mesmo em caso de falha, os relatórios do Surefire, Failsafe e JaCoCo são disponibilizados no artefato `quality-reports` por 14 dias. A configuração está em [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
-<details>
-<summary>Ver execuções aprovadas no GitHub Actions</summary>
-
 ![Pipeline de qualidade aprovada no Pull Request e na branch main](docs/assets/github-actions-ci-aprovada.png)
-
-</details>
 
 ## Evidências do MVP
 
@@ -263,47 +324,60 @@ O contrato OpenAPI 3.1 publica 18 caminhos para clientes, planos, elegibilidade,
 
 A collection Postman possui 31 requisições, com jornadas positivas, cenários negativos, variáveis dinâmicas e scripts de validação.
 
-<details>
-<summary>Ver jornada principal executada no Postman</summary>
-
 ![Jornada principal executada no Postman](docs/assets/postman-jornada-principal.png)
-
-</details>
-
-<details>
-<summary>Ver resposta ProblemDetail validada no Postman</summary>
 
 ![Resposta ProblemDetail validada no Postman](docs/assets/postman-problem-detail.png)
 
-</details>
-
 ### Suíte automatizada
 
-A suíte completa possui 81 testes: 51 rápidos e 30 de integração/API.
-
-<details>
-<summary>Ver execução dos 81 testes automatizados</summary>
-
-![81 testes aprovados na suíte Maven](docs/assets/testes-81-build-success.png)
-
-</details>
+A suíte completa do backend possui 88 testes: 55 rápidos e 33 de integração/API.
 
 ### Cobertura
 
-O JaCoCo registrou 97,07% de instruções e 95,71% de branches, acima do quality gate configurado.
+Na validação da v0.2.0, o JaCoCo registrou 97,31% de instruções e 98,91% de branches, acima do quality gate configurado (80% e 70%, respectivamente).
 
-![Relatório de cobertura JaCoCo](docs/assets/jacoco-cobertura.png)
+![Relatório JaCoCo da validação v0.2.0](docs/assets/jacoco-cobertura-v020.png)
+
+### Interface Web
+
+A interface React consome o backend real e apresenta planos, clientes,
+contratações e solicitações sem dados simulados.
+
+![Tela inicial do frontend AssistLar v0.2.0](docs/assets/frontend-tela-inicial-v020.png)
+
+### Qualidade do frontend
+
+O Vitest registrou 61 testes aprovados e cobertura acima dos limites definidos
+para statements, branches, functions e lines.
+
+![Relatório Vitest da validação v0.2.0](docs/assets/vitest-cobertura-v020.png)
+
+### Jornada E2E com Playwright
+
+O registro abaixo mostra a jornada aprovada no Playwright UI, contra o
+ambiente E2E isolado com Spring Boot e PostgreSQL reais. Ele evidencia a
+execução automatizada de cadastro, elegibilidade, ativação de contratação e
+conclusão da assistência.
+
+![Jornada E2E do AssistLar executada pelo Playwright](docs/assets/playwright-jornada-v020.png)
+
+### Performance com k6
+
+O smoke test validou disponibilidade e contrato antes da carga. Em seguida, o
+workload realizou 204 requisições simultâneas sobre health, planos e clientes,
+com 0% de falhas, 100% dos checks aprovados e nenhuma iteração descartada.
+Todos os thresholds por endpoint foram atendidos.
+
+![Dashboard da execução de carga do AssistLar com k6](docs/assets/k6-carga-v020.png)
+
+A imagem foi exportada pelo dashboard nativo do k6 1.2.3. Os comandos para
+reproduzir o relatório estão na [estratégia de performance](performance-tests/README.md).
 
 ### Ambiente reproduzível
 
 A aplicação e o PostgreSQL são iniciados pelo Docker Compose com health checks.
 
-<details>
-<summary>Ver Docker Compose saudável</summary>
-
 ![Aplicação e PostgreSQL saudáveis](docs/assets/docker-compose-healthy.png)
-
-</details>
 
 Os comandos, critérios e resultados completos estão nas [evidências reproduzíveis](docs/evidencias.md).
 
@@ -317,20 +391,19 @@ Os comandos, critérios e resultados completos estão nas [evidências reproduz�
 - testes concorrentes usam barreiras e timeout, nunca espera arbitrária;
 - `tipoResponsavel` é definido pelo caso de uso e rejeitado nos payloads.
 
-## Fora do escopo da v0.1.0
+## Limites atuais do produto
 
 - autenticação e autorização;
-- interface web e testes de interface;
-- testes de acessibilidade e performance;
+- testes especializados de acessibilidade;
 - notificações e integrações externas;
 - rede de prestadores, geolocalização e agendamento;
 - pagamentos, sinistros, corretor e vigência;
 - implantação em cloud e arquitetura de microsserviços.
 
-Próximas evoluções incluem automação especializada de acessibilidade e
-segurança básica. Os cenários de carga com k6 ficam documentados em
-[`performance-tests/`](performance-tests/), com perfil leve e execução manual
-controlada.
+Próximas evoluções incluem automação especializada de acessibilidade,
+segurança básica e a evolução da estratégia de performance com novos workloads
+de negócio. Os cenários atuais de smoke e carga controlada com k6 estão em
+[`performance-tests/`](performance-tests/).
 
 ## Repositório e licença
 

@@ -62,6 +62,10 @@ class SolicitacaoAssistenciaTest {
                 .isInstanceOf(ExcecaoRegraNegocio.class)
                 .hasMessage("O motivo e obrigatorio para cancelar uma solicitacao em atendimento.");
 
+        assertThatThrownBy(() -> solicitacao.cancelar("  ", ABERTA_EM.plusSeconds(120)))
+                .isInstanceOf(ExcecaoRegraNegocio.class)
+                .hasMessage("O motivo e obrigatorio para cancelar uma solicitacao em atendimento.");
+
         solicitacao.cancelar("  Risco eletrico eliminado  ", ABERTA_EM.plusSeconds(120));
         assertThat(solicitacao.getStatus()).isEqualTo(StatusSolicitacao.CANCELADA);
         assertThat(solicitacao.getMotivoCancelamento()).isEqualTo("Risco eletrico eliminado");

@@ -52,7 +52,7 @@ export function PaginaInicial() {
       </Box>
 
       <Alert severity="info" role="status">
-        A API lista apenas planos. Clientes, contratações e solicitações são retomados por UUID,
+        Clientes, contratações, solicitações e planos usam as consultas reais da API,
         sem simular dados que o backend não fornece.
       </Alert>
 

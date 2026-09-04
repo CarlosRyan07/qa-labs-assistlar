@@ -7,6 +7,7 @@ const diretorioFrontend = resolve(raizProjeto, 'frontend')
 const composeE2e = resolve(raizProjeto, 'frontend/e2e/compose.e2e.yml')
 const projetoDocker = 'qa-labs-assistlar-e2e'
 const ambiente = { ...process.env }
+const urlApiE2e = 'http://127.0.0.1:18080'
 
 delete ambiente.ELECTRON_RUN_AS_NODE
 
@@ -31,6 +32,7 @@ const cliPlaywright = resolve(raizProjeto, 'frontend/node_modules/@playwright/te
 
 try {
   await executar('docker', [...argumentosCompose, 'up', '--build', '--wait'])
+  ambiente.PLAYWRIGHT_API_URL = urlApiE2e
   await executar(process.execPath, [cliPlaywright, 'test', ...process.argv.slice(2)], diretorioFrontend)
 } finally {
   await executar('docker', [...argumentosCompose, 'down', '--volumes', '--remove-orphans'])

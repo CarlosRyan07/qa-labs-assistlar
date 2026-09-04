@@ -22,7 +22,7 @@ Baseline local de 20/07/2026: JDK 21 confirmado, Docker Engine 24.0.6 e Docker C
 
 Critério: todos os testes `*Test` aprovados.
 
-Baseline local: 51 testes rápidos aprovados.
+Baseline local atual da v0.2.0: 55 testes rápidos aprovados.
 
 ## Suíte completa
 
@@ -37,7 +37,23 @@ Critérios:
 - JaCoCo acima de 80% de instruções e 70% de branches;
 - relatório disponível em `target/site/jacoco/index.html`.
 
-Baseline local de 21/07/2026: 51 testes rápidos e 30 testes de integração/API aprovados, com 97,07% de instruções e 95,71% de branches cobertos.
+Validação local atual da v0.2.0: 55 testes rápidos e 33 testes de integração/API
+aprovados, com 97,31% de instruções e 98,91% de branches cobertos. A imagem do
+relatório JaCoCo foi atualizada a partir desta execução.
+
+## Frontend
+
+```bash
+cd frontend
+npm run test:coverage
+npm run test:component
+```
+
+Baseline local da v0.2.0: 61 testes Vitest aprovados, com 87,62% de statements,
+86,24% de branches, 80,70% de functions e 89,09% de lines; 3 testes Cypress
+Component aprovados. A matriz Playwright completa registrou 9 cenários aprovados
+e 3 cenários visuais ignorados fora do Chromium por decisão explícita de
+baseline.
 
 ## Container
 
@@ -81,6 +97,24 @@ Uma branch temporária foi criada com um teste contendo uma falha intencional. O
 
 ![Falha detectada pela CI e merge bloqueado](assets/github-actions-merge-bloqueado.png)
 
+## Performance
+
+Os scripts `smoke-assistlar.js` e `carga-assistlar.js` foram executados com k6
+1.2.3 contra a aplicação local. Na carga controlada, foram concluídas 204 requisições
+com 0% de falhas, 100% dos checks aprovados e nenhuma iteração descartada.
+
+Percentis p95 registrados:
+
+- health: 35,39 ms, abaixo do threshold de 250 ms;
+- planos: 42,14 ms, abaixo do threshold de 500 ms;
+- clientes: 48,85 ms, abaixo do threshold de 750 ms.
+
+Esses números caracterizam apenas o ambiente local da execução. O procedimento,
+os workloads e a justificativa dos thresholds estão em
+[`performance-tests/`](../performance-tests/).
+
+![Dashboard da execução de carga com k6](assets/k6-carga-v020.png)
+
 ## Evidências visuais
 
 As imagens complementam os comandos reproduzíveis e registram a validação visual do MVP:
@@ -88,8 +122,11 @@ As imagens complementam os comandos reproduzíveis e registram a validação vis
 - [Swagger e contrato da API](assets/swagger-api.png)
 - [Jornada principal no Postman](assets/postman-jornada-principal.png)
 - [Cenário negativo com ProblemDetail](assets/postman-problem-detail.png)
-- [Resultado agregado da suíte](assets/testes-81-build-success.png)
-- [Cobertura JaCoCo](assets/jacoco-cobertura.png)
+- [Cobertura JaCoCo da v0.2.0](assets/jacoco-cobertura-v020.png)
+- [Cobertura Vitest da v0.2.0](assets/vitest-cobertura-v020.png)
+- [Tela inicial do frontend v0.2.0](assets/frontend-tela-inicial-v020.png)
+- [Jornada E2E Playwright da v0.2.0](assets/playwright-jornada-v020.png)
+- [Dashboard da carga k6 da v0.2.0](assets/k6-carga-v020.png)
 - [Docker Compose saudável](assets/docker-compose-healthy.png)
 - [Pipeline de qualidade aprovada no GitHub Actions](assets/github-actions-ci-aprovada.png)
 - [Falha detectada pela CI e merge bloqueado](assets/github-actions-merge-bloqueado.png)

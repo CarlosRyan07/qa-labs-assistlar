@@ -59,6 +59,19 @@ class ClienteTest {
     }
 
     @Test
+    void deveRejeitarNomeNuloOuAcimaDeCentoEVinteCaracteres() {
+        assertThatThrownBy(() -> Cliente.cadastrar(null, "nulo@exemplo.com",
+                LocalDate.of(1990, 1, 1), RELOGIO))
+                .isInstanceOf(ExcecaoDadosInvalidos.class)
+                .hasMessage("O nome deve ter entre 3 e 120 caracteres.");
+
+        assertThatThrownBy(() -> Cliente.cadastrar("A".repeat(121), "longo@exemplo.com",
+                LocalDate.of(1990, 1, 1), RELOGIO))
+                .isInstanceOf(ExcecaoDadosInvalidos.class)
+                .hasMessage("O nome deve ter entre 3 e 120 caracteres.");
+    }
+
+    @Test
     void deveAceitarExatamenteCentoEVinteAnos() {
         Cliente cliente = Cliente.cadastrar("Cliente", "cliente120@exemplo.com",
                 LocalDate.of(1906, 7, 20), RELOGIO);

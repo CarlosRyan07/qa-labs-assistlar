@@ -126,6 +126,30 @@ class SolicitacaoApiIT extends PostgreSqlTestContainer {
                 .then().statusCode(422).body("type", equalTo("/erros/limite-esgotado"));
     }
 
+    @Test
+    void deveListarSolicitacoesDaContratacaoEValidarLimitesDaPaginacao() {
+        String contratacaoId = criarContratacao(true);
+        String solicitacaoId = abrirSolicitacao(contratacaoId, "ELETRICISTA");
+
+        given().queryParam("contratacaoId", contratacaoId)
+                .when().get("/solicitacoes-assistencia")
+                .then().statusCode(200)
+                .body("itens", hasSize(1))
+                .body("itens[0].id", equalTo(solicitacaoId))
+                .body("totalItens", equalTo(1));
+
+        validarPaginacaoInvalida(contratacaoId, "pagina", -1);
+        validarPaginacaoInvalida(contratacaoId, "tamanho", 0);
+        validarPaginacaoInvalida(contratacaoId, "tamanho", 101);
+    }
+
+    private void validarPaginacaoInvalida(String contratacaoId, String parametro, int valor) {
+        given().queryParam("contratacaoId", contratacaoId).queryParam(parametro, valor)
+                .when().get("/solicitacoes-assistencia")
+                .then().statusCode(400)
+                .body("type", equalTo("/erros/paginacao-invalida"));
+    }
+
     private String criarContratacao(boolean ativar) {
         return criarContratacao(ativar, PLANO_ESSENCIAL);
     }

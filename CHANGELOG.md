@@ -4,22 +4,30 @@ Todas as alterações relevantes deste projeto serão documentadas neste arquivo
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-26
+
 ### Adicionado
 
-- aplicação Web v0.2.0 em jornada guiada, sem inventar endpoints ausentes no backend;
+- aplicação Web v0.2.0 em jornada guiada sobre o contrato real do backend;
+- listagens paginadas de clientes, contratações e solicitações para apoiar a jornada Web;
+- cenários BDD documentados em Gherkin, vinculados à automação já existente;
 - testes rápidos com Vitest e Testing Library;
 - Cypress Component Testing para componentes de maior risco;
 - Playwright E2E com jornada dourada, cenário negativo, cross-browser e perfil mobile;
+- regressão visual no Chromium com baselines Windows e Linux versionadas;
 - ambientes E2E efêmeros com Compose e PostgreSQL descartável;
 - jobs de qualidade frontend e E2E no GitHub Actions, com artefatos de cobertura e evidências.
 
 ### Qualidade
 
-- 59 testes Vitest aprovados;
+- 88 testes automatizados no backend: 55 rápidos e 33 de integração/API;
+- 61 testes Vitest aprovados;
 - 3 testes Cypress Component aprovados;
-- 8 execuções Playwright aprovadas na matriz completa;
-- 89,83% de statements e 86,88% de branches no frontend.
-- cenário inicial de carga leve com k6 para health e consulta de planos.
+- 9 testes Playwright aprovados na matriz completa, com 3 cenários visuais ignorados fora do Chromium;
+- 97,31% de instruções e 98,91% de branches no backend;
+- 87,62% de statements, 86,24% de branches, 80,70% de functions e 89,09% de lines no frontend;
+- estratégia de performance com smoke test, carga simultânea sobre health,
+  planos e clientes, além de thresholds por endpoint no k6.
 
 ## [0.1.0] - 2026-07-23
 

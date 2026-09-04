@@ -2,6 +2,7 @@ package br.com.ryanqalabs.assistlar.cliente;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.startsWith;
 
@@ -176,6 +177,43 @@ class ClienteApiIT extends PostgreSqlTestContainer {
         .then()
                 .statusCode(400)
                 .body("type", equalTo("/erros/data-nascimento-futura"));
+    }
+
+    @Test
+    void deveListarClientesComBuscaEPaginacaoEValidarSeusLimites() {
+        String emailAna = "ana-listagem-" + UUID.randomUUID() + "@exemplo.com";
+        String emailBruno = "bruno-listagem-" + UUID.randomUUID() + "@exemplo.com";
+        given().contentType(ContentType.JSON)
+                .body(requisicao("Ana Listagem", emailAna, LocalDate.of(1990, 1, 1)))
+                .when().post("/clientes").then().statusCode(201);
+        given().contentType(ContentType.JSON)
+                .body(requisicao("Bruno Listagem", emailBruno, LocalDate.of(1990, 1, 1)))
+                .when().post("/clientes").then().statusCode(201);
+
+        given().queryParam("pagina", 0).queryParam("tamanho", 1)
+                .when().get("/clientes")
+                .then().statusCode(200)
+                .body("itens", hasSize(1))
+                .body("pagina", equalTo(0))
+                .body("tamanho", equalTo(1))
+                .body("totalItens", equalTo(2));
+
+        given().queryParam("busca", emailBruno.toUpperCase())
+                .when().get("/clientes")
+                .then().statusCode(200)
+                .body("itens", hasSize(1))
+                .body("itens[0].email", equalTo(emailBruno));
+
+        validarPaginacaoInvalida("/clientes", "pagina", -1);
+        validarPaginacaoInvalida("/clientes", "tamanho", 0);
+        validarPaginacaoInvalida("/clientes", "tamanho", 101);
+    }
+
+    private void validarPaginacaoInvalida(String caminho, String parametro, int valor) {
+        given().queryParam(parametro, valor)
+                .when().get(caminho)
+                .then().statusCode(400)
+                .body("type", equalTo("/erros/paginacao-invalida"));
     }
 
     private String requisicao(String nome, String email, LocalDate dataNascimento) {

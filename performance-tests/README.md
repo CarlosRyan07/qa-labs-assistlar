@@ -1,69 +1,128 @@
-# Testes de carga do AssistLar
+# Estratégia de performance do AssistLar
 
-Os cenários desta pasta usam k6 para observar o comportamento dos endpoints de
-consulta do AssistLar sob uma carga leve e controlada. O objetivo inicial é
-aprender a modelar carga, thresholds e evidências sem transformar o ambiente
-local em um teste destrutivo.
+Os testes desta pasta usam k6 para avaliar a disponibilidade e o tempo de
+resposta das consultas mais frequentes do AssistLar sob carga local controlada.
+Eles não representam um SLA de produção nem um teste de capacidade máxima.
 
-O cenário não cria clientes, contratações ou solicitações. Ele consulta apenas
-o health check e a listagem de planos, evitando poluir o banco e mantendo a
-execução repetível.
+## Fluxo recomendado
+
+1. Execute o smoke test para confirmar que ambiente e contrato estão íntegros.
+2. Execute o workload de carga somente após o smoke passar.
+3. Compare erros, percentis e iterações descartadas com os thresholds.
+4. Registre como evidência somente resultados obtidos em ambiente identificado.
+
+| Script | Objetivo | Perfil |
+|---|---|---|
+| `smoke-assistlar.js` | detectar indisponibilidade ou quebra básica de contrato | 1 VU, 3 iterações |
+| `carga-assistlar.js` | observar consultas simultâneas de health, planos e clientes | até 5 VUs em rampa e 2 req/s na listagem |
+
+Os cenários são somente de leitura. Assim, as execuções são repetíveis e não
+criam clientes, contratações ou solicitações no banco.
+
+## Thresholds
+
+Os valores são objetivos iniciais para o ambiente local, escolhidos para
+detectar regressões evidentes sem apresentá-los como capacidade de produção:
+
+| Indicador | Limite | Motivo |
+|---|---:|---|
+| requisições com falha | menor que 1% na carga; zero no smoke | preservar estabilidade funcional |
+| checks aprovados | maior que 99% na carga; 100% no smoke | validar status e estrutura mínima |
+| health p95 | menor que 250 ms | endpoint simples de disponibilidade |
+| planos p95 / p99 | menor que 500 ms / 1 s | consulta pequena e estável |
+| clientes p95 / p99 | menor que 750 ms / 1,2 s | consulta paginada com acesso ao banco |
+| iterações descartadas | zero | confirmar que a taxa solicitada foi sustentada |
+
+Um threshold reprovado encerra o k6 com código diferente de zero. Percentis
+devem ser comparados entre execuções equivalentes; um resultado isolado não
+prova escalabilidade.
 
 ## Pré-requisitos
 
-- Docker Desktop com o Engine ativo;
-- Docker Compose;
-- aplicação AssistLar iniciada pelo Compose.
+- aplicação AssistLar disponível em `http://localhost:8080`;
+- PostgreSQL disponível para a aplicação;
+- k6 1.2.3 local ou Docker Desktop com o Engine ativo.
 
-O k6 é executado pela imagem oficial `grafana/k6:0.55.2`. Assim, não é
-necessário instalar k6 globalmente no Windows, no Node.js ou no Maven.
+## Executar com k6 instalado
 
-## Executar localmente no Windows
-
-Na raiz do repositório:
+Na raiz do repositório, em PowerShell:
 
 ```powershell
-docker compose up --build --wait
+& "$env:LOCALAPPDATA\Programs\k6\k6.exe" run performance-tests\k6\smoke-assistlar.js
+& "$env:LOCALAPPDATA\Programs\k6\k6.exe" run performance-tests\k6\carga-assistlar.js
+```
+
+Se `k6` estiver no `PATH`, os mesmos testes podem ser executados com:
+
+```powershell
+k6 run performance-tests\k6\smoke-assistlar.js
+k6 run performance-tests\k6\carga-assistlar.js
+```
+
+## Executar com Docker
+
+Com a aplicação já iniciada, execute no Windows:
+
+```powershell
+docker run --rm -i `
+  --add-host=host.docker.internal:host-gateway `
+  -e BASE_URL=http://host.docker.internal:8080 `
+  -v "${PWD}\performance-tests:/scripts:ro" `
+  grafana/k6:1.2.3 run /scripts/k6/smoke-assistlar.js
 
 docker run --rm -i `
   --add-host=host.docker.internal:host-gateway `
   -e BASE_URL=http://host.docker.internal:8080 `
   -v "${PWD}\performance-tests:/scripts:ro" `
-  grafana/k6:0.55.2 run /scripts/k6/carga-assistlar.js
-
-docker compose down
+  grafana/k6:1.2.3 run /scripts/k6/carga-assistlar.js
 ```
 
-O `host.docker.internal` permite que o container do k6 acesse a aplicação
-publicada na máquina host pelo Docker Desktop.
+No Linux ou macOS, use o mesmo volume com
+`-v "$PWD/performance-tests:/scripts:ro"`.
 
-## Executar no Linux ou macOS
+## Outro ambiente controlado
 
-```bash
-docker compose up --build --wait
-
-docker run --rm -i \
-  --add-host=host.docker.internal:host-gateway \
-  -e BASE_URL=http://host.docker.internal:8080 \
-  -v "$PWD/performance-tests:/scripts:ro" \
-  grafana/k6:0.55.2 run /scripts/k6/carga-assistlar.js
-
-docker compose down
-```
-
-O comando encerra com falha quando um threshold não é atendido. A saída do k6
-é a evidência principal nesta primeira versão; relatórios brutos não são
-versionados.
-
-## Perfil e limites
-
-O perfil padrão é uma carga leve: até 5 usuários virtuais, com duração curta e
-pausa entre iterações. Para apontar para outro ambiente controlado, altere
-`BASE_URL`, por exemplo:
+A variável `BASE_URL` troca o destino sem modificar o script:
 
 ```powershell
--e BASE_URL=http://host.docker.internal:8080
+$env:BASE_URL = "http://localhost:8080"
+k6 run performance-tests\k6\smoke-assistlar.js
+Remove-Item Env:BASE_URL
 ```
 
-Não execute este cenário contra produção sem autorização, janela de teste,
+Não execute esses workloads contra produção sem autorização, janela de teste,
 limites acordados e observabilidade suficiente.
+
+## Como interpretar a saída
+
+- `http_req_failed`: proporção de requisições HTTP com erro;
+- `http_req_duration`: tempo total da requisição, observado em percentis;
+- `checks`: proporção das validações funcionais aprovadas;
+- `dropped_iterations`: iterações que o k6 não conseguiu iniciar na taxa pedida;
+- `vus` e `iterations`: concorrência utilizada e trabalho concluído.
+
+Relatórios brutos devem ser gravados em `performance-tests/results/`, pasta
+ignorada pelo Git. A versão do k6 e as condições do ambiente devem acompanhar
+qualquer evidência publicada.
+
+## Gerar o dashboard de evidência
+
+O dashboard HTML usado como origem da evidência visual pode ser reproduzido em
+PowerShell sem instalar extensões adicionais:
+
+```powershell
+New-Item -ItemType Directory -Force performance-tests\results | Out-Null
+$env:K6_WEB_DASHBOARD = "true"
+$env:K6_WEB_DASHBOARD_OPEN = "false"
+$env:K6_WEB_DASHBOARD_EXPORT = "performance-tests/results/k6-carga-v020.html"
+
+k6 run performance-tests\k6\carga-assistlar.js
+
+Remove-Item Env:K6_WEB_DASHBOARD
+Remove-Item Env:K6_WEB_DASHBOARD_OPEN
+Remove-Item Env:K6_WEB_DASHBOARD_EXPORT
+```
+
+O HTML em `performance-tests/results/` é temporário e não deve ser versionado.
+A imagem selecionada para o portfólio fica em
+`docs/assets/k6-carga-v020.png`.
