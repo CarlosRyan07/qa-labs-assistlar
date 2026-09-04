@@ -107,6 +107,30 @@ class ContratacaoApiIT extends PostgreSqlTestContainer {
                 .then().statusCode(200).body("$", hasSize(2));
     }
 
+    @Test
+    void deveListarContratacoesDoClienteEValidarLimitesDaPaginacao() {
+        String clienteId = cadastrarClienteAdulto();
+        String contratacaoId = criarContratacao(clienteId, PLANO_ESSENCIAL);
+
+        given().queryParam("clienteId", clienteId)
+                .when().get("/contratacoes")
+                .then().statusCode(200)
+                .body("itens", hasSize(1))
+                .body("itens[0].id", equalTo(contratacaoId))
+                .body("totalItens", equalTo(1));
+
+        validarPaginacaoInvalida(clienteId, "pagina", -1);
+        validarPaginacaoInvalida(clienteId, "tamanho", 0);
+        validarPaginacaoInvalida(clienteId, "tamanho", 101);
+    }
+
+    private void validarPaginacaoInvalida(String clienteId, String parametro, int valor) {
+        given().queryParam("clienteId", clienteId).queryParam(parametro, valor)
+                .when().get("/contratacoes")
+                .then().statusCode(400)
+                .body("type", equalTo("/erros/paginacao-invalida"));
+    }
+
     private String cadastrarClienteAdulto() {
         return cadastrarCliente(LocalDate.of(1990, 1, 1));
     }
