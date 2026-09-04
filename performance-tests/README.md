@@ -41,7 +41,7 @@ prova escalabilidade.
 
 - aplicação AssistLar disponível em `http://localhost:8080`;
 - PostgreSQL disponível para a aplicação;
-- k6 local ou Docker Desktop com o Engine ativo.
+- k6 1.2.3 local ou Docker Desktop com o Engine ativo.
 
 ## Executar com k6 instalado
 
@@ -68,13 +68,13 @@ docker run --rm -i `
   --add-host=host.docker.internal:host-gateway `
   -e BASE_URL=http://host.docker.internal:8080 `
   -v "${PWD}\performance-tests:/scripts:ro" `
-  grafana/k6:0.55.2 run /scripts/k6/smoke-assistlar.js
+  grafana/k6:1.2.3 run /scripts/k6/smoke-assistlar.js
 
 docker run --rm -i `
   --add-host=host.docker.internal:host-gateway `
   -e BASE_URL=http://host.docker.internal:8080 `
   -v "${PWD}\performance-tests:/scripts:ro" `
-  grafana/k6:0.55.2 run /scripts/k6/carga-assistlar.js
+  grafana/k6:1.2.3 run /scripts/k6/carga-assistlar.js
 ```
 
 No Linux ou macOS, use o mesmo volume com
@@ -104,3 +104,25 @@ limites acordados e observabilidade suficiente.
 Relatórios brutos devem ser gravados em `performance-tests/results/`, pasta
 ignorada pelo Git. A versão do k6 e as condições do ambiente devem acompanhar
 qualquer evidência publicada.
+
+## Gerar o dashboard de evidência
+
+O dashboard HTML usado como origem da evidência visual pode ser reproduzido em
+PowerShell sem instalar extensões adicionais:
+
+```powershell
+New-Item -ItemType Directory -Force performance-tests\results | Out-Null
+$env:K6_WEB_DASHBOARD = "true"
+$env:K6_WEB_DASHBOARD_OPEN = "false"
+$env:K6_WEB_DASHBOARD_EXPORT = "performance-tests/results/k6-carga-v020.html"
+
+k6 run performance-tests\k6\carga-assistlar.js
+
+Remove-Item Env:K6_WEB_DASHBOARD
+Remove-Item Env:K6_WEB_DASHBOARD_OPEN
+Remove-Item Env:K6_WEB_DASHBOARD_EXPORT
+```
+
+O HTML em `performance-tests/results/` é temporário e não deve ser versionado.
+A imagem selecionada para o portfólio fica em
+`docs/assets/k6-carga-v020.png`.

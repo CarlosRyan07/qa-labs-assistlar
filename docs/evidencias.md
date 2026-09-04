@@ -100,18 +100,20 @@ Uma branch temporária foi criada com um teste contendo uma falha intencional. O
 ## Performance
 
 Os scripts `smoke-assistlar.js` e `carga-assistlar.js` foram executados com k6
-contra a aplicação local. Na carga controlada, foram concluídas 204 requisições
+1.2.3 contra a aplicação local. Na carga controlada, foram concluídas 204 requisições
 com 0% de falhas, 100% dos checks aprovados e nenhuma iteração descartada.
 
 Percentis p95 registrados:
 
-- health: 105,14 ms, abaixo do threshold de 250 ms;
-- planos: 49,57 ms, abaixo do threshold de 500 ms;
-- clientes: 41,31 ms, abaixo do threshold de 750 ms.
+- health: 35,39 ms, abaixo do threshold de 250 ms;
+- planos: 42,14 ms, abaixo do threshold de 500 ms;
+- clientes: 48,85 ms, abaixo do threshold de 750 ms.
 
 Esses números caracterizam apenas o ambiente local da execução. O procedimento,
 os workloads e a justificativa dos thresholds estão em
 [`performance-tests/`](../performance-tests/).
+
+![Dashboard da execução de carga com k6](assets/k6-carga-v020.png)
 
 ## Evidências visuais
 
@@ -124,6 +126,7 @@ As imagens complementam os comandos reproduzíveis e registram a validação vis
 - [Cobertura Vitest da v0.2.0](assets/vitest-cobertura-v020.png)
 - [Tela inicial do frontend v0.2.0](assets/frontend-tela-inicial-v020.png)
 - [Jornada E2E Playwright da v0.2.0](assets/playwright-jornada-v020.png)
+- [Dashboard da carga k6 da v0.2.0](assets/k6-carga-v020.png)
 - [Docker Compose saudável](assets/docker-compose-healthy.png)
 - [Pipeline de qualidade aprovada no GitHub Actions](assets/github-actions-ci-aprovada.png)
 - [Falha detectada pela CI e merge bloqueado](assets/github-actions-merge-bloqueado.png)

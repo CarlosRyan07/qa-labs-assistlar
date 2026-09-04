@@ -79,3 +79,18 @@ e referência para a automação existente, em [cenarios-bdd.md](cenarios-bdd.md
 | PERF-01 | smoke validar health, planos e paginação de clientes sem erros | k6/smoke |
 | PERF-02 | carga simultânea sustentar consultas sem falhas ou iterações descartadas | k6/carga |
 | PERF-03 | tempos p95 e p99 permanecerem dentro dos thresholds por endpoint | k6/carga |
+
+## Interface Web
+
+| ID | Cenário | Nível |
+|---|---|---|
+| CMP-01 | manter o atalho para o conteúdo principal focalizável | Cypress Component |
+| CMP-02 | exigir motivo antes do cancelamento em atendimento | Cypress Component |
+| CMP-03 | enviar somente o motivo e mostrar o estado confirmado | Cypress Component |
+| E2E-01 | concluir a jornada principal pelo navegador | Playwright Full Stack |
+| E2E-02 | exigir motivo antes de cancelar uma solicitação em atendimento | Playwright Full Stack |
+| E2E-03 | preservar a página inicial pela regressão visual | Playwright/Chromium |
+
+Os 61 testes Vitest cobrem componentes, hooks, páginas e contratos do frontend.
+Eles são contabilizados como `WEB-UNIT` no resumo do README; seus nomes no código
+são a fonte detalhada para diagnóstico e manutenção.
