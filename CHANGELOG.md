@@ -20,13 +20,14 @@ Todas as alterações relevantes deste projeto serão documentadas neste arquivo
 
 ### Qualidade
 
-- 84 testes automatizados no backend: 54 rápidos e 30 de integração/API;
+- 88 testes automatizados no backend: 55 rápidos e 33 de integração/API;
 - 61 testes Vitest aprovados;
 - 3 testes Cypress Component aprovados;
 - 9 testes Playwright aprovados na matriz completa, com 3 cenários visuais ignorados fora do Chromium;
-- 90,75% de instruções e 72,83% de branches no backend;
+- 97,31% de instruções e 98,91% de branches no backend;
 - 87,62% de statements, 86,24% de branches, 80,70% de functions e 89,09% de lines no frontend;
-- cenário baseline de carga leve com k6 para health e consulta de planos.
+- estratégia de performance com smoke test, carga simultânea sobre health,
+  planos e clientes, além de thresholds por endpoint no k6.
 
 ## [0.1.0] - 2026-07-23
 

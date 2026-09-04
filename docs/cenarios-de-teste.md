@@ -17,6 +17,8 @@ e referência para a automação existente, em [cenarios-bdd.md](cenarios-bdd.md
 | CLI-06 | normalizar e-mail e impedir duplicidade case-insensitive | integração/API |
 | CLI-07 | rejeitar nome com menos de 3 caracteres úteis | unitário/API |
 | CLI-08 | inativar e reativar | unitário/API |
+| CLI-09 | listar e buscar clientes por e-mail sem diferenciar maiúsculas | integração/API |
+| CLI-10 | rejeitar página negativa e tamanho fora do intervalo de 1 a 100 | integração/API |
 
 ## Elegibilidade
 
@@ -39,6 +41,7 @@ e referência para a automação existente, em [cenarios-bdd.md](cenarios-bdd.md
 | CON-05 | permitir nova contratação após cancelamento | API |
 | CON-06 | impedir cancelamento com solicitação ativa | integração/API |
 | CON-07 | duas inserções simultâneas geram um sucesso e um conflito | concorrência/banco |
+| CON-08 | listar por cliente e rejeitar limites inválidos de paginação | integração/API |
 
 ## Solicitação e limites
 
@@ -56,6 +59,7 @@ e referência para a automação existente, em [cenarios-bdd.md](cenarios-bdd.md
 | SOL-10 | COMPLETO aceitar dois usos e rejeitar o terceiro | API |
 | SOL-11 | aberturas simultâneas não ultrapassarem limite | concorrência |
 | SOL-12 | dois inícios simultâneos produzirem uma transição | concorrência/optimistic locking |
+| SOL-13 | listar por contratação e rejeitar limites inválidos de paginação | integração/API |
 
 ## Contrato e operação
 
@@ -67,3 +71,11 @@ e referência para a automação existente, em [cenarios-bdd.md](cenarios-bdd.md
 | OPS-01 | Flyway aplicar do zero em PostgreSQL 17.10 | integração |
 | OPS-02 | health exposto e info não exposto | API |
 | OPS-03 | imagem e Compose iniciarem aplicação saudável | container |
+
+## Performance
+
+| ID | Cenário | Nível |
+|---|---|---|
+| PERF-01 | smoke validar health, planos e paginação de clientes sem erros | k6/smoke |
+| PERF-02 | carga simultânea sustentar consultas sem falhas ou iterações descartadas | k6/carga |
+| PERF-03 | tempos p95 e p99 permanecerem dentro dos thresholds por endpoint | k6/carga |

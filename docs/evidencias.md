@@ -22,7 +22,7 @@ Baseline local de 20/07/2026: JDK 21 confirmado, Docker Engine 24.0.6 e Docker C
 
 Critério: todos os testes `*Test` aprovados.
 
-Baseline local da v0.2.0: 54 testes rápidos aprovados.
+Baseline local atual da v0.2.0: 55 testes rápidos aprovados.
 
 ## Suíte completa
 
@@ -37,7 +37,9 @@ Critérios:
 - JaCoCo acima de 80% de instruções e 70% de branches;
 - relatório disponível em `target/site/jacoco/index.html`.
 
-Baseline local da v0.2.0 em 26/08/2026: 54 testes rápidos e 30 testes de integração/API aprovados, com 90,75% de instruções e 72,83% de branches cobertos.
+Validação local atual da v0.2.0: 55 testes rápidos e 33 testes de integração/API
+aprovados, com 97,31% de instruções e 98,91% de branches cobertos. A imagem do
+relatório JaCoCo foi atualizada a partir desta execução.
 
 ## Frontend
 
@@ -94,6 +96,22 @@ O workflow de CI foi validado durante o Pull Request e novamente após o merge n
 Uma branch temporária foi criada com um teste contendo uma falha intencional. O GitHub Actions detectou a regressão, e o check obrigatório `Build, testes e qualidade` manteve o botão de merge desabilitado. O Pull Request foi fechado e a branch temporária foi excluída sem integração na `main`.
 
 ![Falha detectada pela CI e merge bloqueado](assets/github-actions-merge-bloqueado.png)
+
+## Performance
+
+Os scripts `smoke-assistlar.js` e `carga-assistlar.js` foram executados com k6
+contra a aplicação local. Na carga controlada, foram concluídas 204 requisições
+com 0% de falhas, 100% dos checks aprovados e nenhuma iteração descartada.
+
+Percentis p95 registrados:
+
+- health: 105,14 ms, abaixo do threshold de 250 ms;
+- planos: 49,57 ms, abaixo do threshold de 500 ms;
+- clientes: 41,31 ms, abaixo do threshold de 750 ms.
+
+Esses números caracterizam apenas o ambiente local da execução. O procedimento,
+os workloads e a justificativa dos thresholds estão em
+[`performance-tests/`](../performance-tests/).
 
 ## Evidências visuais
 

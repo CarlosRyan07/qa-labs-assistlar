@@ -13,12 +13,12 @@ Plataforma fictícia de assistências residenciais desenvolvida para demonstrar 
 
 ## Resultados em números
 
-- **84 testes automatizados no backend**
-- **54 testes rápidos e 30 de integração/API**
+- **88 testes automatizados no backend**
+- **55 testes rápidos e 33 de integração/API**
 - **61 testes Vitest e 3 testes Cypress no frontend**
 - **9 testes Playwright aprovados na matriz E2E completa**
-- **90,75% de cobertura de instruções no backend**
-- **72,83% de cobertura de branches no backend**
+- **97,31% de cobertura de instruções no backend**
+- **98,91% de cobertura de branches no backend**
 - **87,62% de statements e 86,24% de branches no frontend**
 - **31 requisições na collection Postman**
 - **18 caminhos documentados no OpenAPI 3.1**
@@ -46,7 +46,7 @@ Plataforma fictícia de assistências residenciais desenvolvida para demonstrar 
 - quality gate de cobertura com JaCoCo;
 - ambiente reproduzível com Docker Compose.
 - interface React com testes de unidade, componentes, E2E e regressão visual;
-- baseline controlada de performance com k6.
+- estratégia de performance com smoke test, workloads simultâneos e thresholds por endpoint no k6.
 
 ## Domínio do MVP
 
@@ -206,7 +206,7 @@ Decisões da estratégia:
 - entidades e regras de domínio são exercitadas diretamente, sem mocks desnecessários;
 - antes de cada teste de integração, apenas os dados mutáveis são limpos; migrations, planos e coberturas de referência são preservados;
 - testes concorrentes usam barreiras determinísticas e timeout, nunca `Thread.sleep`;
-- Surefire executa os 54 testes rápidos, enquanto Failsafe complementa a execução com 30 testes de integração/API.
+- Surefire executa os 55 testes rápidos, enquanto Failsafe complementa a execução com 33 testes de integração/API.
 
 ## Testes e quality gate
 
@@ -284,11 +284,11 @@ A collection Postman possui 31 requisições, com jornadas positivas, cenários 
 
 ### Suíte automatizada
 
-A suíte completa do backend possui 84 testes: 54 rápidos e 30 de integração/API.
+A suíte completa do backend possui 88 testes: 55 rápidos e 33 de integração/API.
 
 ### Cobertura
 
-Na validação da v0.2.0, o JaCoCo registrou 90,75% de instruções e 72,83% de branches, acima do quality gate configurado (80% e 70%, respectivamente).
+Na validação da v0.2.0, o JaCoCo registrou 97,31% de instruções e 98,91% de branches, acima do quality gate configurado (80% e 70%, respectivamente).
 
 ![Relatório JaCoCo da validação v0.2.0](docs/assets/jacoco-cobertura-v020.png)
 
@@ -348,12 +348,12 @@ Os comandos, critérios e resultados completos estão nas [evidências reproduz�
 - implantação em cloud e arquitetura de microsserviços.
 
 Próximas evoluções incluem automação especializada de acessibilidade,
-segurança básica e uma estratégia de performance com workloads de negócio
-adicionais. O baseline atual de carga leve com k6 está em
+segurança básica e a evolução da estratégia de performance com novos workloads
+de negócio. Os cenários atuais de smoke e carga controlada com k6 estão em
 [`performance-tests/`](performance-tests/).
 
 ## Repositório e licença
 
-O AssistLar é o primeiro projeto público do **QA Labs**, iniciativa criada para transformar experiência profissional em projetos autorais, reproduzíveis e documentados.
+O AssistLar é o primeiro projeto público do **Ryan QA Labs**, iniciativa criada para transformar experiência profissional em projetos autorais, reproduzíveis e documentados.
 
 Distribuído sob a [licença MIT](LICENSE).
